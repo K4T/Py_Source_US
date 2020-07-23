@@ -1,61 +1,60 @@
-# Pangya Server S8 Global(US)
+# Pangya Server S8 Global (US)
 
-Este Projeto é a minha versão do Desenvolvimento, você pode baixar a outra versão do projeto
+This Project is my version of Development, you can download the other version of the project
 
 https://github.com/eantoniobr/UGPangya
 
-## Sobre o Projeto
+## About the project
 
-Servidor Desenvolvido na linguagem Csharp
+Server Developed in Csharp
 
-### Requesitos
+### Requirements
 
-é necessário alguns programas para rodar o projeto
+some programs are needed to run the project
 
-* [Visual Studio](https://visualstudio.microsoft.com/pt-br/) usado para compilação do projeto
-* [SQL SERVER](https://www.microsoft.com/pt-br/sql-server/sql-server-downloads) 2017 ou superior usado para criar o banco que será usado
-* [Pangya Client](https://drive.google.com/file/d/0B_RaG0yzITpIY3Foa0lZZlRMVVk/view) Pangya US 824.00 usado para conectar ao servidor
+* [Visual Studio](https://visualstudio.microsoft.com/pt-br/) used to compile the project
+* [SQL SERVER](https://www.microsoft.com/pt-br/sql-server/sql-server-downloads) or higher used to create the database that will be used
+* [Pangya Client](https://drive.google.com/file/d/0B_RaG0yzITpIY3Foa0lZZlRMVVk/view) Pangya US 824.00 or 852.00 used to connect to the server
 
-### Instalação
+### Installation
 
-o primeiro projeto a ser rodado será AuthServer, pois o mesmo irar será sicronizar todos os servidores
+the first project to be run will be AuthServer, because the same thing will be to sync all servers
 
-```
-editar ou arquivos .ini para conectar-se ao servidor online ou localhost
-```
+``
+edit or .ini files to connect to the online server or localhost
+``
 
-## Autores
+## Authors
 
-* **Eric Antonio** - *Criador do Projeto* - [Pangya Unogames](https://github.com/eantoniobr)
-* **Luis MK** - *Contribuidor do projeto* - [Pangya Unogames](https://github.com/luismk)
+* **Eric Antonio** - *Project Creator* - [Pangya Unogames](https://github.com/eantoniobr)
+* **Luis MK** - *Project contributor* - [Pangya Unogames](https://github.com/luismk)
 
-## Funções já criadas no Game Server
+## Functions already created on the Game Server
 * GameLogin
 * PSQUARE
-* GAME VERSUS(STROKE)
 * LoginDaily
 * BoxRandom
 * Card System
 * ChatOffLine
-* ClubSet System (falta concluir)
+* ClubSet System (to be completed)
 * Comet Refil System
-* Game Master System(não 100%, mas funciona)
+* Game Master System (not 100%, but it works)
 * EXPSystem
-* GameShop System(90% falta melhor um pouco mais)
-* Guild System (falta mexer nos procedimentos)
-* Item Recycle (falta eu mexer ainda, e criar o table)
+* GameShop System (90% better a little more)
+* Guild System (procedures still need to be changed)
+* Item Recycle (I still need to mix and create the table)
 * Lobby System
 * Mail System
 * Mail Sender System
-* Papel Shop(black papel)
+* Paper Shop (black paper)
 * Memorial Gacha System
 * MyRoom System
 * Item Rental System
 * Scratch Card System
 * Self Design System
 * Ticket System
-* Tutorial System (falta terminar o envio do pacote inicial no main game server)
-* Outras Funções não citadas
+* Tutorial System (we still need to finish sending the initial package on the main game server)
+* Other functions not mentioned
 
 
 ## Display Run Server 
@@ -64,9 +63,6 @@ editar ou arquivos .ini para conectar-se ao servidor online ou localhost
 ![pangya_001](https://user-images.githubusercontent.com/27017433/80647538-06390c80-8a45-11ea-872b-4792f27a5f31.jpg)
 ![pangya_002](https://user-images.githubusercontent.com/27017433/80647541-076a3980-8a45-11ea-891c-cf118744a605.jpg)
 ![ChatRoomDancing](https://user-images.githubusercontent.com/27017433/80647964-b4dd4d00-8a45-11ea-932c-aa2bcff32a14.png)
-
-* GAME VERSUS(STROKE)
-![GameVersus](https://user-images.githubusercontent.com/27017433/80647972-b9096a80-8a45-11ea-8b32-8eee90257e3d.png)
 
 * Tutorial System
 ![Tutorial1](https://user-images.githubusercontent.com/27017433/80647978-bc045b00-8a45-11ea-910f-3791b8c1efe7.png)
