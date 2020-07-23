@@ -102,11 +102,15 @@ namespace Py_Game.MainServer
 
         internal static bool CheckVersion(string version)
         {
-            if (_server.Data.GameVersion == version)
+            if (_server.Data.GameVersion == version || version == "824.00"  || version == "852.00")
+            { 
                 return true;
+            }
             else
+            { 
                 _server.Data.BlockFunc = 2;
                 return false;
+            }
         }
     }   
 }
