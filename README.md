@@ -4,28 +4,20 @@ This Project is my version of Development, you can download the other version of
 
 https://github.com/eantoniobr/UGPangya
 
-
-
-## About the project
-
-Server Developed in Csharp
+![pangya_001](https://user-images.githubusercontent.com/27017433/80647538-06390c80-8a45-11ea-872b-4792f27a5f31.jpg)
 
 - [Authors](#authors)
 - [Installation](#installation)
 - [Requirements](#start)
 - [Account](#account)
 - [Information](#information)
-- [ShowCase](#showcase)
 - [GameServer Info](#functions)
 - [Web Server](#apache)
-
-
 
 ### Installation
 
 the first project to be run will be AuthServer, because the same thing will be to sync all servers
 
-``
 edit or .ini files to connect to the online server or localhost
 
 to connect to your instance of SQL SERVER (MSSQL) you need to edit the file
@@ -38,7 +30,6 @@ name of your instance      DataBase Name
 data source=cleudiana\sql;initial catalog=DB_Pangya
 
 https://github.com/luismk/Py_Source_US/blob/master/Src/Py_Game/Py_Game/App.config
-``
 
 ### Start
 
@@ -97,7 +88,6 @@ insert Username and Password then close the table and try to log into the create
 
 ### ShowCase
 * GAME CHAT_ROOM(PSQUARE)
-![pangya_001](https://user-images.githubusercontent.com/27017433/80647538-06390c80-8a45-11ea-872b-4792f27a5f31.jpg)
 ![pangya_002](https://user-images.githubusercontent.com/27017433/80647541-076a3980-8a45-11ea-891c-cf118744a605.jpg)
 ![ChatRoomDancing](https://user-images.githubusercontent.com/27017433/80647964-b4dd4d00-8a45-11ea-932c-aa2bcff32a14.png)
 
