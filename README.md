@@ -4,17 +4,22 @@ This Project is my version of Development, you can download the other version of
 
 https://github.com/eantoniobr/UGPangya
 
+
+
 ## About the project
 
 Server Developed in Csharp
 
-### Requirements
+- [Authors](#authors)
+- [Installation](#installation)
+- [Requirements](#start)
+- [Account](#account)
+- [Information](#information)
+- [ShowCase](#showcase)
+- [GameServer Info](#functions)
+- [Web Server](#apache)
 
-some programs are needed to run the project
 
-* [Visual Studio](https://visualstudio.microsoft.com/pt-br/) used to compile the project
-* [SQL SERVER](https://www.microsoft.com/pt-br/sql-server/sql-server-downloads) or higher used to create the database that will be used
-* [Pangya Client](https://drive.google.com/file/d/0B_RaG0yzITpIY3Foa0lZZlRMVVk/view) Pangya US 824.00 or 852.00 used to connect to the server
 
 ### Installation
 
@@ -22,14 +27,47 @@ the first project to be run will be AuthServer, because the same thing will be t
 
 ``
 edit or .ini files to connect to the online server or localhost
+
+to connect to your instance of SQL SERVER (MSSQL) you need to edit the file
+
+App.Config for each project
+
+Example:
+
+name of your instance      DataBase Name 
+data source=cleudiana\sql;initial catalog=DB_Pangya
+
+https://github.com/luismk/Py_Source_US/blob/master/Src/Py_Game/Py_Game/App.config
 ``
 
-## Authors
+### Start
+
+some programs are needed to run the project
+
+* [Visual Studio](https://visualstudio.microsoft.com/pt-br/) used to compile the project
+* [SQL SERVER](https://www.microsoft.com/pt-br/sql-server/sql-server-downloads) or higher used to create the database that will be used
+* [Pangya Client](https://drive.google.com/file/d/0B_RaG0yzITpIY3Foa0lZZlRMVVk/view) Server Is Available with ProjectG 852.00 and 824.00 GB
+
+### Account
+restore the database
+and look for the "Pangya_Member" table
+insert Username and Password then close the table and try to log into the created account
+
+### Authors
 
 * **Eric Antonio** - *Project Creator* - [Pangya Unogames](https://github.com/eantoniobr)
 * **Luis MK** - *Project contributor* - [Pangya Unogames](https://github.com/luismk)
 
-## Functions already created on the Game Server
+### Information
+* Login Server: 100% complete
+* Messenger Server: 20% completed
+* GameServer: 60% completed
+* AuthServer: ?????
+
+### Apache
+[WebServer](https://www.mediafire.com/file/mhhpuy2plmrk7q6/WebServer.rar/file)
+
+### Functions
 * GameLogin
 * PSQUARE
 * LoginDaily
@@ -57,8 +95,7 @@ edit or .ini files to connect to the online server or localhost
 * Other functions not mentioned
 
 
-## Display Run Server 
-
+### ShowCase
 * GAME CHAT_ROOM(PSQUARE)
 ![pangya_001](https://user-images.githubusercontent.com/27017433/80647538-06390c80-8a45-11ea-872b-4792f27a5f31.jpg)
 ![pangya_002](https://user-images.githubusercontent.com/27017433/80647541-076a3980-8a45-11ea-891c-cf118744a605.jpg)
