@@ -366,15 +366,18 @@ namespace PangyaAPI.BinaryModels
 
         public object Read(object value, int Count)
         {
-            byte[] recordData = ReadBytes(Count);
+             var ValueCount = Marshal.SizeOf(value);
 
-            IntPtr ptr = Marshal.AllocHGlobal(Count);
+            byte[] recordData = ReadBytes(Count);
+                       
+
+            IntPtr ptr = Marshal.AllocHGlobal(ValueCount);
 
             Marshal.Copy(recordData, 0, ptr, Count);
 
             value = Marshal.PtrToStructure(ptr, value.GetType());
             Marshal.FreeHGlobal(ptr);
-            return value;
+            return value;           
         }
 
         public void ReadObject(out object obj)

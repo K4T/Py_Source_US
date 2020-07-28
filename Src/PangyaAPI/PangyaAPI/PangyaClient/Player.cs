@@ -12,7 +12,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
-using static PangyaAPI.Crypts.Cryptor;
+using static PangCrypt.ServerCipher;
 namespace PangyaAPI.PangyaClient
 {
     public abstract partial class Player : IDisposeable
@@ -97,7 +97,7 @@ namespace PangyaAPI.PangyaClient
         #region Player Send Packets 
         public void Send(PangyaBinaryWriter packet)
         {
-            var buffer = packet.GetBytes().ServerEncrypt(GetKey);
+            var buffer = Encrypt(packet.GetBytes(), GetKey, 0);
 
             SendBytes(buffer);
         }
@@ -135,7 +135,7 @@ namespace PangyaAPI.PangyaClient
         }
         public void SendResponse()
         {
-            var buffer = Response.GetBytes().ServerEncrypt(GetKey);
+            var buffer = Encrypt(Response.GetBytes(), GetKey, 0);
 
             SendBytes(buffer);
             if (Response.GetSize > 0)
@@ -153,7 +153,7 @@ namespace PangyaAPI.PangyaClient
         }
         public void Send(byte[] Data)
         {
-            var buffer = Data.ServerEncrypt(GetKey);
+            var buffer = Encrypt(Data,GetKey, 0);
 
             SendBytes(buffer);
         }
@@ -164,11 +164,41 @@ namespace PangyaAPI.PangyaClient
             {
                 Tcp.GetStream().Write(buffer, 0, buffer.Length);
             }
-            Task.Delay(5000);
+            Thread.Sleep(5000);
         }
-       
+
+        public void Handle()
+        {
+            var thread = new Thread(new ThreadStart(RefreshData));
+            thread.Start();
+
+            var keepAliveThread = new Thread(new ThreadStart(KeepAlive));
+            keepAliveThread.Start();
+        }
+
+        /// <summary>
+        /// Verifica de tempo em tempo se o Client ainda está conectado.
         /// </summary>
-        public void RefreshData()
+        void KeepAlive()
+        {
+            while (true)
+            {
+                //Aguarda tempo
+                Thread.Sleep(TimeSpan.FromSeconds(5));
+
+                try
+                {
+                    //Send KeepAlive
+                    SendBytes(new byte[0]);
+                }
+                catch
+                {
+                    throw new Exception($"PLAYER NOT CONNECTED {GetLogin}");
+                }
+            }
+        }
+
+        void RefreshData()
         {
             while (true)
             {

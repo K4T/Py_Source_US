@@ -46,6 +46,8 @@ namespace Py_AuthServer
         private TcpListener _server;
 
         public ServerSettings Data { get; set; }
+
+        public PangyaEntities db;
         #endregion
 
         #region Constructor
@@ -76,6 +78,8 @@ namespace Py_AuthServer
                     Type = AuthClientTypeEnum.AuthServer
                 };
                 _server = new TcpListener(IPAddress.Parse(Data.IP), (int)Data.Port);
+
+                db = new PangyaEntities();
             }
             catch (Exception erro)
             {
@@ -89,6 +93,13 @@ namespace Py_AuthServer
         {
             try
             {
+
+                var servers = db.Pangya_Server.Where(c => c.Active == true && c.Port != 7997).ToList();
+                foreach (var _server in servers)
+                {
+                    db.Database.SqlQuery<PangyaEntities>($"UPDATE [dbo].[Pangya_Server] Set Active = '{0}' where ServerID = '{_server.ServerID}'").FirstOrDefault();
+                }
+
                 Data.InsertServer();
 
                 _server.Start((int)Data.MaxPlayers);
@@ -247,8 +258,6 @@ namespace Py_AuthServer
 
         public void UpdateClient(AuthClient Client)
         {
-            var db = new PangyaEntities();
-
             var query = $"UPDATE [dbo].[Pangya_Server] Set UsersOnline = '{0}', Active = '{0}' where ServerID = '{Client.Data.UID}'";
 
             db.Database.SqlQuery<PangyaEntities>(query).FirstOrDefault();
@@ -256,11 +265,48 @@ namespace Py_AuthServer
 
         public void UpdateServer()
         {
-            var db = new PangyaEntities();
-
             var query = $"UPDATE [dbo].[Pangya_Server] Set UsersOnline = '{Clients.Count}' where ServerID = '{Data.UID}'";
 
             db.Database.SqlQuery<PangyaEntities>(query).FirstOrDefault();
+        }
+
+        public void RunCommand(string[] Command)
+        {
+           // string ReadCommand;
+
+            if (Command.Length > 1)
+            {
+               // ReadCommand = Command[1];
+            }
+            else
+            {
+              //  ReadCommand = "";
+            }
+            switch (Command[0])
+            {
+                case "cls":
+                case "limpar":
+                case "clear":
+                    {
+                        Console.Clear();
+                    }
+                    break;
+                case "quit":
+                case "exit":
+                case "close":
+                case "sair":
+                case "fechar":
+                    {
+                        Console.WriteLine("The server was stopped!");
+                        Environment.Exit(1);
+                    }
+                    break;
+                default:
+                    {
+                        WriteConsole.WriteLine("[SYSTEM_COMMAND]: Sorry Unknown Command, type 'help' to get the list of commands", ConsoleColor.Red);
+                    }
+                    break;
+            }
         }
         #endregion
     }

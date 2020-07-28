@@ -1,25 +1,21 @@
-﻿using System;
-using PangyaAPI.BinaryModels;
+﻿using PangyaAPI.BinaryModels;
 using Py_Game.Data;
-
 namespace Py_Game.Client.Inventory.Data
 {
     public struct Action
     {
-        public UInt32 Animate;
-        public UInt16 Unknown1;
-        public UInt32 Posture;
-        public Point3D Vector;
-        public float Rotation;
-        public byte[] Message;
+        public uint Animate;
+        public ushort Unknown1;
+        public uint Posture;
+        public Point3D Vector { get; set; }
+        public string Animation;
         public Action Clear()
         {
-             Animate = 0;
-            Unknown1 = 0;
+            Animate = 0;
+            Unknown1 = 3490;
             Posture = 0;
             Vector = new Point3D();
-            Message = new byte[5];
-            Rotation = 0;
+            Animation = "";
             return this;
         }
 
@@ -30,9 +26,9 @@ namespace Py_Game.Client.Inventory.Data
             try
             {
                 Packet.WriteUInt32(Animate);
-                Packet.WriteUInt16(0);
+                Packet.WriteUInt16(Unknown1);
                 Packet.WriteUInt32(Posture);
-                Packet.WriteStruct(Vector);               
+                Packet.WriteStruct(Vector);
                 return Packet.GetBytes();
             }
             finally
@@ -41,7 +37,7 @@ namespace Py_Game.Client.Inventory.Data
             }
         }
 
-        public Single Distance(Point3D Position)
+        public float Distance(Point3D Position)
         {
             return Vector.Distance(Position);
         }

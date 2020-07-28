@@ -40,7 +40,7 @@ namespace Py_Game.Functions
                         {
                             ShopItem = (ShopItemRequest)packet.Read(new ShopItemRequest());
 
-                            Console.WriteLine($"[PLAYER_BUY_ITEM_RESULT]: TypeID({ShopItem.IffTypeId}), Name({IffEntry.GetItemName(ShopItem.IffTypeId)}) IsPang({ShopItem.PangPrice > 0}), IsCookie({ShopItem.CookiePrice > 0})");
+                            Console.WriteLine($"[BUY_ITEM_RESULT]: TypeID =>{ShopItem.IffTypeId}, Name =>{IffEntry.GetItemName(ShopItem.IffTypeId)} IsPang =>{ShopItem.PangPrice > 0}, IsCookie =>{ShopItem.CookiePrice > 0}");
 
                             if (!IffEntry.IsExist(ShopItem.IffTypeId))
                             {
@@ -97,19 +97,18 @@ namespace Py_Game.Functions
                                         if (ShopItem.CookiePrice > 0)
                                         {
                                             player.SendResponse(ShowBuyItemSucceed(TGAME_SHOP.BUY_FAIL));
-                                            WriteConsole.WriteLine("CookiePriceType => {0} ", new object[] { IffEntry.GetShopPriceType(ShopItem.IffTypeId) });
+                                            Utils.Log("GameShopCore", $"CookiePriceType: {IffEntry.GetShopPriceType(ShopItem.IffTypeId)}", "GameShopCoreSystem");
                                             return;
                                         }
                                         if (ShopItem.PangPrice > 0)
                                         {
                                             player.SendResponse(ShowBuyItemSucceed(TGAME_SHOP.BUY_FAIL));
-                                            WriteConsole.WriteLine("PangPriceType  => {0} ", new object[] { IffEntry.GetShopPriceType(ShopItem.IffTypeId) });
+                                            Utils.Log("GameShopCore", $"PangPriceType: {IffEntry.GetShopPriceType(ShopItem.IffTypeId)}", "GameShopCoreSystem");
                                             return;
                                         }
                                     }
                                     break;
                             }
-
                             AddShopItem(player, ShopItem);
                         }
                     }

@@ -49,7 +49,10 @@ namespace Py_Game.Client.Inventory
             }
             return new byte[0x3E];
         }
-
+        /// <summary>
+        /// return 78 bytes
+        /// </summary>
+        /// <returns></returns>
         public override byte[] GetTrophyInfo()
         {
             return ItemTrophies.GetTrophy();

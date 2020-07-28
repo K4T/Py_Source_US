@@ -80,6 +80,7 @@ namespace Py_Login
             if (Program.Server.OpenServer == false)
             {
                 HandleLoginMessage(LoginMessageEnum.ServerInMaintenance);
+                WriteConsole.WriteLine("[LOGIN_SERVER]: Server is down for Maintenance");
                 Disconnect();
                 return;
             }

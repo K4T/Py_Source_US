@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using static PangyaAPI.Crypts.Cryptor;
+using static PangCrypt.ClientCipher;
 namespace PangyaAPI.PangyaPacket
 {
     public class Packet : IDisposable
@@ -44,7 +44,7 @@ namespace PangyaAPI.PangyaPacket
             MessageCrypted = new byte[message.Length];
             Buffer.BlockCopy(message, 0, MessageCrypted, 0, message.Length); //Copia mensagem recebida criptografada
 
-            Message = message.ClientDecrypt(key);
+            Message = Decrypt(message, key);
 
             _stream = new MemoryStream(Message);
 

@@ -16,7 +16,6 @@ using Py_Game.Data;
 using Py_Game.Game.Modes;
 using PangyaAPI.PangyaPacket;
 using PangyaAPI.Tools;
-
 namespace Py_Game.Game
 {
     public abstract class GameBase
@@ -41,7 +40,6 @@ namespace Py_Game.Game
         public DateTime TerminateTime { get; set; }
 
         protected GameInformation fGameData;
-        public uint PlayConnectionID { get; set; } = uint.MaxValue;
         public Point3D CurrentHole;
         protected uint Owner { get; set; }
         protected bool Started { get; set; }
@@ -85,7 +83,7 @@ namespace Py_Game.Game
         // Player Event
         protected PlayerEvent PlayerJoin { get; set; }
         protected PlayerEvent PlayerLeave { get; set; }
-     
+
         #endregion
 
         #region Public Delegate
@@ -1014,7 +1012,7 @@ namespace Py_Game.Game
         protected void PlayerHoleData(GPlayer PL, Packet packet)
         {
             var H = (HoleData)packet.Read(new HoleData());
-            
+
             CurrentHole = new Point3D()
             {
                 X = H.X,
@@ -1230,30 +1228,23 @@ namespace Py_Game.Game
             FirstShot = true;
         }
 
-        protected void PlayerEnterToRoom(GPlayer player,Packet packet)
+        protected void PlayerEnterToRoom(GPlayer player, Packet packet)
         {
             var ConID = packet.ReadUInt32();
-
-            Send(ShowRoomEntrance(player.ConnectionID));
+            Console.WriteLine("[PLAYER_TO_ROOM] => " + ConID);
+            player.Send(ShowRoomEntrance(ConID));
         }
 
         protected void PlayerAction(GPlayer player, Packet packet)
         {
+           
             try
             {
-                player.GameInfo.Action.Message = packet.GetRemainingData;
-
-                Send(ShowPlayerAction(player.ConnectionID, packet.GetRemainingData));
                 if (!packet.ReadByte(out byte Action))
                 {
                     return;
                 }
 
-
-                if (GameType == GAME_TYPE.CHAT_ROOM && Action == 4)
-                {
-                    //Send(ShowRoomEntrance(player.ConnectionID, 15));
-                }
                 switch ((TPLAYER_ACTION)Action)
                 {
                     case TPLAYER_ACTION.PLAYER_ACTION_ROTATION:
@@ -1282,9 +1273,12 @@ namespace Py_Game.Game
                         break;
                     case TPLAYER_ACTION.PLAYER_ACTION_ANIMATION:
                         {
-                            player.GameInfo.Action.Message = packet.GetRemainingData;
+                            if (!packet.ReadPStr(out player.GameInfo.Action.Animation))
+                            {
+                                return;
+                            }
 
-                            Console.WriteLine("[PLAYER_ACTION_ANIMATION] => " + packet.ReadPStr());
+                            Console.WriteLine("[PLAYER_ACTION_ANIMATION] => " + player.GameInfo.Action.Animation);
 
                         }
                         break;
@@ -1296,9 +1290,15 @@ namespace Py_Game.Game
                             }
                         }
                         break;
-                   
+
                     case TPLAYER_ACTION.PLAYER_ANIMATION_WITH_EFFECTS:
                         {
+                            if (!packet.ReadPStr(out player.GameInfo.Action.Animation))
+                            {
+                                return;
+                            }
+
+                            Console.WriteLine("[PLAYER_ANIMATION_WITH_EFFECTS] => " + player.GameInfo.Action.Animation);
                         }
                         break;
                     case TPLAYER_ACTION.PLAYER_ACTION_NULL:
@@ -1314,6 +1314,7 @@ namespace Py_Game.Game
             finally
             {
             }
+            Send(ShowPlayerAction(player.ConnectionID, packet.GetRemainingData));
         }
 
         #endregion

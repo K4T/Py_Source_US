@@ -75,6 +75,11 @@ namespace Py_Game.Client
                     Unknown2 = new byte[8] { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, }
                 };
             }
+
+            if (UserStatistic.Level == 0)
+            {
+                UserStatistic.Level = 70;
+            }
         }
         [MethodImpl(MethodImplOptions.NoInlining)]
         public void LoadGuildData()

@@ -343,33 +343,22 @@ namespace Py_Messenger.MainServer
                         ShowHelp();
                     }
                     break;
+                case "quit":
+                case "exit":
+                case "close":
+                case "sair":
+                case "fechar":
+                    {
+                        Console.WriteLine("The server was stopped!");
+                        Environment.Exit(1);
+                    }
+                    break;
                 default:
                     {
                         WriteConsole.WriteLine("[SYSTEM_COMMAND]: Sorry Unknown Command, type 'help' to get the list of commands", ConsoleColor.Red);
                     }
                     break;
             }
-        }
-
-        internal void ShowHelp()
-        {
-            Console.WriteLine(Environment.NewLine);
-            WriteConsole.WriteLine("Welcome To Py-Messenger!" + Environment.NewLine);
-
-            WriteConsole.WriteLine("See available console commands:" + Environment.NewLine);
-
-            WriteConsole.WriteLine("help      | Displays console commands");
-            WriteConsole.WriteLine("topnotice | Displays message to users who are playing Game");
-            WriteConsole.WriteLine("kickuser  | Disconnect by UserName");
-            WriteConsole.WriteLine("kicknick  | Disconnect by Nick");
-            WriteConsole.WriteLine("kickuid   | Disconnect by UID");
-            WriteConsole.WriteLine("ListLobby | ShowLobby");
-
-            WriteConsole.WriteLine("clear     | Clear Console");
-            WriteConsole.WriteLine("cls       | Clear console");
-            WriteConsole.WriteLine("quit      | Close By Server");
-
-            Console.WriteLine(Environment.NewLine);
         }
     }
 }

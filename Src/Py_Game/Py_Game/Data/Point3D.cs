@@ -1,10 +1,5 @@
-﻿using PangyaAPI;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Py_Game.Data
 {
@@ -14,7 +9,6 @@ namespace Py_Game.Data
         public float X { get; set; }
         public float Y { get; set; }
         public float Z { get; set; }
-
 
         public static Point3D operator -(Point3D PosA, Point3D PosB)
         {
@@ -36,6 +30,7 @@ namespace Py_Game.Data
             };
             return result;
         }
+
         public float Distance(Point3D PlayerPos)
         {
             return (this - PlayerPos).Length();

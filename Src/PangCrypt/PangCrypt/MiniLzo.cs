@@ -1,6 +1,6 @@
-﻿#region License
+#region License
 
-/* Gamed on the MiniLZO library by Markus Oberhumer and some code
+/* Based on the MiniLZO library by Markus Oberhumer and some code
    from a port to C# by Frank Razenberg.
 
    Copyright (C) 1996-2019 Markus Franz Xaver Johannes Oberhumer
@@ -27,12 +27,270 @@
  */
 
 #endregion
-namespace PangyaAPI.Crypts
+
+namespace PangCrypt
 {
     using System;
     using System.IO;
-    public static class Lzo
+    public static class MiniLzo
     {
+        #region Helpers
+
+        private static uint ReadU32(byte[] arr, uint i)
+        {
+            return (uint)(arr[i] | (arr[i + 1] << 8) | (arr[i + 2] << 16) | (arr[i + 3] << 24));
+        }
+
+        private static uint ReadU16(byte[] arr, uint i)
+        {
+            return (uint)(arr[i] | (arr[i + 1] << 8));
+        }
+
+        private static readonly int[] MultiplyDeBruijnBitPosition =
+        {
+            0, 1, 28, 2, 29, 14, 24, 3, 30, 22, 20, 15, 25, 17, 4, 8,
+            31, 27, 13, 23, 21, 19, 16, 7, 26, 12, 18, 6, 11, 5, 10, 9
+        };
+
+        private static int LzoBitOpsCtz32(uint v)
+        {
+            return MultiplyDeBruijnBitPosition[(uint)((v & -v) * 0x077CB531U) >> 27];
+        }
+
+        private static uint NearestPowerOfTwo(uint n)
+        {
+            n--;
+            n |= n >> 1;
+            n |= n >> 2;
+            n |= n >> 4;
+            n |= n >> 8;
+            n |= n >> 16;
+            return n + 1;
+        }
+
+        private static void AllocSpace(ref byte[] array, uint minLength)
+        {
+            Array.Resize(ref array, (int)NearestPowerOfTwo(minLength));
+        }
+
+        private static void EnsureSpace(uint need, ref byte[] array, uint pos)
+        {
+            var needLen = pos + need;
+            if (needLen > array.Length) AllocSpace(ref array, needLen);
+        }
+
+        #endregion
+
+        #region Compression
+
+        private static uint Lzo1X1CompressCore(byte[] @in, uint inIndex, uint inLen, byte[] @out, uint outIndex,
+            out uint outLen, uint ti, ushort[] dict)
+        {
+            var inEnd = inIndex + inLen;
+            var ipEnd = inIndex + inLen - 20;
+            var op = outIndex;
+            var ip = inIndex;
+            var ii = ip;
+            ip += ti < 4 ? 4 - ti : 0;
+
+            for (;;)
+            {
+                literal:
+                ip += 1 + ((ip - ii) >> 5);
+                next:
+                if (ip >= ipEnd)
+                    break;
+                var dv = ReadU32(@in, ip);
+                var dIndex = (((0x1824429d * dv) >> (32 - 14)) & (((1u << 14) - 1) >> 0)) << 0;
+                var mPos = inIndex + dict[dIndex];
+                dict[dIndex] = (ushort) (ip - inIndex);
+                if (dv != ReadU32(@in, mPos))
+                    goto literal;
+
+                ii -= ti;
+                ti = 0;
+                {
+                    var t = ip - ii;
+                    if (t != 0)
+                    {
+                        if (t <= 3)
+                        {
+                            @out[op - 2] |= (byte) t;
+                            Array.Copy(@in, ii, @out, op, t);
+                            op += t;
+                        }
+                        else if (t <= 16)
+                        {
+                            @out[op++] = (byte) (t - 3);
+                            Array.Copy(@in, ii, @out, op, t);
+                            op += t;
+                        }
+                        else
+                        {
+                            if (t <= 18)
+                            {
+                                @out[op++] = (byte) (t - 3);
+                            }
+                            else
+                            {
+                                var tt = t - 18;
+                                @out[op++] = 0;
+                                while (tt > 255)
+                                {
+                                    tt -= 255;
+                                    @out[op++] = 0;
+                                }
+
+                                @out[op++] = (byte) tt;
+                            }
+
+                            Array.Copy(@in, ii, @out, op, t);
+                            op += t;
+                        }
+                    }
+                }
+                uint mLen = 4;
+                {
+                    var v = ReadU32(@in, ip + mLen) ^ ReadU32(@in, mPos + mLen);
+                    while (v == 0)
+                    {
+                        mLen += 4;
+                        v = ReadU32(@in, ip + mLen) ^ ReadU32(@in, mPos + mLen);
+                        if (ip + mLen >= ipEnd)
+                            goto m_len_done;
+                    }
+
+                    mLen += (uint) LzoBitOpsCtz32(v) / 8;
+                }
+                m_len_done:
+                var mOff = ip - mPos;
+                ip += mLen;
+                ii = ip;
+                if (mLen <= 8 && mOff <= 0x0800)
+                {
+                    mOff -= 1;
+                    @out[op++] = (byte) (((mLen - 1) << 5) | ((mOff & 7) << 2));
+                    @out[op++] = (byte) (mOff >> 3);
+                }
+                else if (mOff <= 0x4000)
+                {
+                    mOff -= 1;
+                    if (mLen <= 33)
+                    {
+                        @out[op++] = (byte) (32 | (mLen - 2));
+                    }
+                    else
+                    {
+                        mLen -= 33;
+                        @out[op++] = 32 | 0;
+                        while (mLen > 255)
+                        {
+                            mLen -= 255;
+                            @out[op++] = 0;
+                        }
+
+                        @out[op++] = (byte) mLen;
+                    }
+
+                    @out[op++] = (byte) (mOff << 2);
+                    @out[op++] = (byte) (mOff >> 6);
+                }
+                else
+                {
+                    mOff -= 0x4000;
+                    if (mLen <= 9)
+                    {
+                        @out[op++] = (byte) (16 | ((mOff >> 11) & 8) | (mLen - 2));
+                    }
+                    else
+                    {
+                        mLen -= 9;
+                        @out[op++] = (byte) (16 | ((mOff >> 11) & 8));
+                        while (mLen > 255)
+                        {
+                            mLen -= 255;
+                            @out[op++] = 0;
+                        }
+
+                        @out[op++] = (byte) mLen;
+                    }
+
+                    @out[op++] = (byte) (mOff << 2);
+                    @out[op++] = (byte) (mOff >> 6);
+                }
+
+                goto next;
+            }
+
+            outLen = op - outIndex;
+            return inEnd - (ii - ti);
+        }
+
+        private static void Lzo1X1Compress(byte[] @in, uint inLen, byte[] @out, out uint outLen, ushort[] dict)
+        {
+            uint ip = 0;
+            uint op = 0;
+            var l = inLen;
+            uint t = 0;
+            while (l > 20)
+            {
+                var ll = l;
+                ll = ll <= 49152 ? ll : 49152;
+                var llEnd = ip + ll;
+                if (llEnd + ((t + ll) >> 5) <= llEnd || llEnd + ((t + ll) >> 5) <= ip + ll)
+                    break;
+
+                for (var i = 0; i < (1 << 14) * sizeof(ushort); i++)
+                    dict[i] = 0;
+                t = Lzo1X1CompressCore(@in, ip, ll, @out, op, out outLen, t, dict);
+                ip += ll;
+                op += outLen;
+                l -= ll;
+            }
+
+            t += l;
+            if (t > 0)
+            {
+                ulong ii = inLen - t;
+                if (op == 0 && t <= 238)
+                {
+                    @out[op++] = (byte) (17 + t);
+                }
+                else if (t <= 3)
+                {
+                    @out[op - 2] |= (byte) t;
+                }
+                else if (t <= 18)
+                {
+                    @out[op++] = (byte) (t - 3);
+                }
+                else
+                {
+                    var tt = t - 18;
+                    @out[op++] = 0;
+                    while (tt > 255)
+                    {
+                        tt -= 255;
+                        @out[op++] = 0;
+                    }
+
+                    @out[op++] = (byte) tt;
+                }
+
+                do
+                {
+                    @out[op++] = @in[ii++];
+                } while (--t > 0);
+            }
+
+            @out[op++] = 16 | 1;
+            @out[op++] = 0;
+            @out[op++] = 0;
+            outLen = op;
+        }
+
+        #endregion
+
         #region Decompression
 
         private static byte[] Lzo1XDecompress(byte[] @in)
@@ -207,263 +465,6 @@ namespace PangyaAPI.Crypts
 
         #endregion Decompression
 
-        #region Helpers
-
-        private static uint ReadU32(byte[] arr, uint i)
-        {
-            return (uint)(arr[i] | (arr[i + 1] << 8) | (arr[i + 2] << 16) | (arr[i + 3] << 24));
-        }
-
-        private static uint ReadU16(byte[] arr, uint i)
-        {
-            return (uint)(arr[i] | (arr[i + 1] << 8));
-        }
-
-        private static readonly int[] MultiplyDeBruijnBitPosition =
-        {
-            0, 1, 28, 2, 29, 14, 24, 3, 30, 22, 20, 15, 25, 17, 4, 8,
-            31, 27, 13, 23, 21, 19, 16, 7, 26, 12, 18, 6, 11, 5, 10, 9
-        };
-
-        private static int LzoBitOpsCtz32(uint v)
-        {
-            return MultiplyDeBruijnBitPosition[(uint)((v & -v) * 0x077CB531U) >> 27];
-        }
-
-        private static uint NearestPowerOfTwo(uint n)
-        {
-            n--;
-            n |= n >> 1;
-            n |= n >> 2;
-            n |= n >> 4;
-            n |= n >> 8;
-            n |= n >> 16;
-            return n + 1;
-        }
-
-        private static void AllocSpace(ref byte[] array, uint minLength)
-        {
-            Array.Resize(ref array, (int)NearestPowerOfTwo(minLength));
-        }
-
-        private static void EnsureSpace(uint need, ref byte[] array, uint pos)
-        {
-            var needLen = pos + need;
-            if (needLen > array.Length) AllocSpace(ref array, needLen);
-        }
-
-        #endregion
-
-        #region Compression
-
-        private static uint Lzo1X1CompressCore(byte[] @in, uint inIndex, uint inLen, byte[] @out, uint outIndex,
-            out uint outLen, uint ti, ushort[] dict)
-        {
-            var inEnd = inIndex + inLen;
-            var ipEnd = inIndex + inLen - 20;
-            var op = outIndex;
-            var ip = inIndex;
-            var ii = ip;
-            ip += ti < 4 ? 4 - ti : 0;
-
-            for (;;)
-            {
-                literal:
-                ip += 1 + ((ip - ii) >> 5);
-                next:
-                if (ip >= ipEnd)
-                    break;
-                var dv = ReadU32(@in, ip);
-                var dIndex = (((0x1824429d * dv) >> (32 - 14)) & (((1u << 14) - 1) >> 0)) << 0;
-                var mPos = inIndex + dict[dIndex];
-                dict[dIndex] = (ushort)(ip - inIndex);
-                if (dv != ReadU32(@in, mPos))
-                    goto literal;
-
-                ii -= ti;
-                ti = 0;
-                {
-                    var t = ip - ii;
-                    if (t != 0)
-                    {
-                        if (t <= 3)
-                        {
-                            @out[op - 2] |= (byte)t;
-                            Array.Copy(@in, ii, @out, op, t);
-                            op += t;
-                        }
-                        else if (t <= 16)
-                        {
-                            @out[op++] = (byte)(t - 3);
-                            Array.Copy(@in, ii, @out, op, t);
-                            op += t;
-                        }
-                        else
-                        {
-                            if (t <= 18)
-                            {
-                                @out[op++] = (byte)(t - 3);
-                            }
-                            else
-                            {
-                                var tt = t - 18;
-                                @out[op++] = 0;
-                                while (tt > 255)
-                                {
-                                    tt -= 255;
-                                    @out[op++] = 0;
-                                }
-
-                                @out[op++] = (byte)tt;
-                            }
-
-                            Array.Copy(@in, ii, @out, op, t);
-                            op += t;
-                        }
-                    }
-                }
-                uint mLen = 4;
-                {
-                    var v = ReadU32(@in, ip + mLen) ^ ReadU32(@in, mPos + mLen);
-                    while (v == 0)
-                    {
-                        mLen += 4;
-                        v = ReadU32(@in, ip + mLen) ^ ReadU32(@in, mPos + mLen);
-                        if (ip + mLen >= ipEnd)
-                            goto m_len_done;
-                    }
-
-                    mLen += (uint)LzoBitOpsCtz32(v) / 8;
-                }
-                m_len_done:
-                var mOff = ip - mPos;
-                ip += mLen;
-                ii = ip;
-                if (mLen <= 8 && mOff <= 0x0800)
-                {
-                    mOff -= 1;
-                    @out[op++] = (byte)(((mLen - 1) << 5) | ((mOff & 7) << 2));
-                    @out[op++] = (byte)(mOff >> 3);
-                }
-                else if (mOff <= 0x4000)
-                {
-                    mOff -= 1;
-                    if (mLen <= 33)
-                    {
-                        @out[op++] = (byte)(32 | (mLen - 2));
-                    }
-                    else
-                    {
-                        mLen -= 33;
-                        @out[op++] = 32 | 0;
-                        while (mLen > 255)
-                        {
-                            mLen -= 255;
-                            @out[op++] = 0;
-                        }
-
-                        @out[op++] = (byte)mLen;
-                    }
-
-                    @out[op++] = (byte)(mOff << 2);
-                    @out[op++] = (byte)(mOff >> 6);
-                }
-                else
-                {
-                    mOff -= 0x4000;
-                    if (mLen <= 9)
-                    {
-                        @out[op++] = (byte)(16 | ((mOff >> 11) & 8) | (mLen - 2));
-                    }
-                    else
-                    {
-                        mLen -= 9;
-                        @out[op++] = (byte)(16 | ((mOff >> 11) & 8));
-                        while (mLen > 255)
-                        {
-                            mLen -= 255;
-                            @out[op++] = 0;
-                        }
-
-                        @out[op++] = (byte)mLen;
-                    }
-
-                    @out[op++] = (byte)(mOff << 2);
-                    @out[op++] = (byte)(mOff >> 6);
-                }
-
-                goto next;
-            }
-
-            outLen = op - outIndex;
-            return inEnd - (ii - ti);
-        }
-
-        private static void Lzo1X1Compress(byte[] @in, uint inLen, byte[] @out, out uint outLen, ushort[] dict)
-        {
-            uint ip = 0;
-            uint op = 0;
-            var l = inLen;
-            uint t = 0;
-            while (l > 20)
-            {
-                var ll = l;
-                ll = ll <= 49152 ? ll : 49152;
-                var llEnd = ip + ll;
-                if (llEnd + ((t + ll) >> 5) <= llEnd || llEnd + ((t + ll) >> 5) <= ip + ll)
-                    break;
-
-                for (var i = 0; i < (1 << 14) * sizeof(ushort); i++)
-                    dict[i] = 0;
-                t = Lzo1X1CompressCore(@in, ip, ll, @out, op, out outLen, t, dict);
-                ip += ll;
-                op += outLen;
-                l -= ll;
-            }
-
-            t += l;
-            if (t > 0)
-            {
-                ulong ii = inLen - t;
-                if (op == 0 && t <= 238)
-                {
-                    @out[op++] = (byte)(17 + t);
-                }
-                else if (t <= 3)
-                {
-                    @out[op - 2] |= (byte)t;
-                }
-                else if (t <= 18)
-                {
-                    @out[op++] = (byte)(t - 3);
-                }
-                else
-                {
-                    var tt = t - 18;
-                    @out[op++] = 0;
-                    while (tt > 255)
-                    {
-                        tt -= 255;
-                        @out[op++] = 0;
-                    }
-
-                    @out[op++] = (byte)tt;
-                }
-
-                do
-                {
-                    @out[op++] = @in[ii++];
-                } while (--t > 0);
-            }
-
-            @out[op++] = 16 | 1;
-            @out[op++] = 0;
-            @out[op++] = 0;
-            outLen = op;
-        }
-
-        #endregion
-
         #region API
 
         public static byte[] Decompress(byte[] input)
@@ -472,17 +473,17 @@ namespace PangyaAPI.Crypts
             {
                 return Lzo1XDecompress(input);
             }
-            catch
+            catch (IndexOutOfRangeException e)
             {
-                return input;
+                throw new IOException("Input buffer ends too early", e);
             }
         }
 
         public static byte[] Compress(byte[] input)
         {
             var @out = new byte[input.Length + input.Length / 16 + 64 + 3];
-            Lzo1X1Compress(input, (uint)input.Length, @out, out var outLen, new ushort[32768]);
-            Array.Resize(ref @out, (int)outLen);
+            Lzo1X1Compress(input, (uint) input.Length, @out, out var outLen, new ushort[32768]);
+            Array.Resize(ref @out, (int) outLen);
             return @out;
         }
 

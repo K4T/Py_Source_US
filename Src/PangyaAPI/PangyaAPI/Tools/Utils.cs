@@ -1,13 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace PangyaAPI.Tools
 {
-    internal static class Utils
+    public static class Utils
     {
+        private static string caminhoExe = string.Empty;
+
         // this method from https://www.codeproject.com/Articles/36747/Quick-and-Dirty-HexDump-of-a-Byte-Array
         public static string HexDump(this byte[] bytes, int bytesPerLine = 16)
         {
@@ -72,6 +76,44 @@ namespace PangyaAPI.Tools
             }
 
             return result.ToString();
+        }
+
+        public static bool Log(string name, string strMensagem, string strNomeArquivo = "ArquivoLog")
+        {
+            try
+            {
+                caminhoExe = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+                string caminhoArquivo = Path.Combine(caminhoExe, strNomeArquivo);
+                if (!File.Exists(caminhoArquivo))
+                {
+                    FileStream arquivo = File.Create(caminhoArquivo);
+                    arquivo.Close();
+                }
+                using (StreamWriter w = File.AppendText(caminhoArquivo))
+                {
+                    AppendLog(name,strMensagem, w);
+                }
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+        private static void AppendLog(string nameLog,string logMensagem, TextWriter txtWriter)
+        {
+            try
+            {
+                txtWriter.Write($"\r\n{nameLog} : ");
+                txtWriter.WriteLine($"{DateTime.Now.ToLongTimeString()} {DateTime.Now.ToLongDateString()}");
+                txtWriter.WriteLine("  :");
+                txtWriter.WriteLine($"  :{logMensagem}");
+                txtWriter.WriteLine("------------------------------------");
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
         }
     }
 }

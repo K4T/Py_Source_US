@@ -177,35 +177,24 @@ namespace Py_Game.MainServer
         protected override void ServerExpection(Player Client, Exception Ex)
         {
             var player = (GPlayer)Client;
-            var _db = new PangyaEntities();
             try
             {
 
                 var query = $" exec dbo.ProcSaveExceptionLog @UID = '{player.GetUID}', @USER =  '{player.GetLogin}', @EXCEPTIONMESSAGE= '{Ex.Message}', @SERVER = '{Data.Name}'";
 
-                _db.Database.SqlQuery<PangyaEntities>(query);
+                player._db.Database.SqlQuery<PangyaEntities>(query);
 
-                System.Diagnostics.StackTrace trace = new System.Diagnostics.StackTrace(Ex, true);
-                var FileWrite = new StreamWriter("GameLog.txt", true);
-                FileWrite.WriteLine($"--------------------------- PLAYER_EXCEPTION ------------------------------------------");
-                FileWrite.WriteLine($"Date: {DateTime.Now}");
-                FileWrite.WriteLine($"Server_Info: NAME {Data.Name}, ID {Data.UID}, PORT {Data.Port}");
-                FileWrite.WriteLine(trace.GetFrame(0).GetMethod().ReflectedType.FullName);
-                FileWrite.WriteLine("Method: " + Ex.TargetSite);
-                FileWrite.WriteLine("Line: " + trace.GetFrame(0).GetFileLineNumber());
-                FileWrite.WriteLine("Column: " + trace.GetFrame(0).GetFileColumnNumber());
-                FileWrite.WriteLine($"--------------------------- END ------------------------------------------");
-                FileWrite.Dispose();
+                Utils.Log($"GameServer-{Data.Port}", $"Exception: {Ex.Message}", "GameServer");
+
                 if (player.Connected)
                 {
                     DisconnectPlayer(player);
                 }
             }
-            finally
+            catch
             {
-                _db.Dispose();
+                new GameTools.ClearMemory().FlushMemory();
             }
-            new GameTools.ClearMemory().FlushMemory();
         }
 
 
@@ -476,6 +465,16 @@ namespace Py_Game.MainServer
 
 
                         this.AuthServer.Send(packet);
+                    }
+                    break;
+                case "quit":
+                case "exit":
+                case "close":
+                case "sair":
+                case "fechar":
+                    {
+                        Console.WriteLine("The server was stopped!");
+                        Environment.Exit(1);
                     }
                     break;
                 default:

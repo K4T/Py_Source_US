@@ -8,6 +8,9 @@ using static Py_Game.Lobby.Collection.ChannelCollection;
 using static Py_Game.GameTools.PacketCreator;
 using static Py_Game.GameTools.Tools;
 using PangyaAPI.PangyaPacket;
+using Py_Game.Game.Data;
+using Py_Game.Defines;
+using PangyaAPI.Tools;
 
 namespace Py_Game.Functions
 {
@@ -147,7 +150,7 @@ namespace Py_Game.Functions
             {
                 return;
             }
-            Console.WriteLine(packet.ReadUInt32());
+            
             packet.ReadPStr(out string Nickname);
             packet.ReadPStr(out string Messages);
 
@@ -225,15 +228,73 @@ namespace Py_Game.Functions
                 }
             }
         }
-
-        public void PlayerCreateGame(GPlayer player, Packet packet)
+        //02 : The Room is full
+        //03 : The Room is not exist
+        //04 : wrong password
+        //05 : you cannot get in this room level
+        //07 : can not create game
+        //08 : game is in progress
+        public void CreateGame(GPlayer player, Packet packet)
         {
-            var PLobby = player.Lobby;
+            GameInformation GameData;
+            Channel PLobby;
+
+            PLobby = player.Lobby;
             if (PLobby == null && player.Game != null)
             {
                 return;
             }
-            PLobby.PlayerCreateGame(player, packet);
+
+            //read first 18 bytes values
+            GameData = new GameInformation
+            {
+                Unknown1 = packet.ReadByte(),//1
+                VSTime = packet.ReadUInt32(),//5/
+                GameTime = packet.ReadUInt32(),//9
+                MaxPlayer = packet.ReadByte(),//10
+                GameType = (GAME_TYPE)packet.ReadByte(),//11
+                HoleTotal = packet.ReadByte(),//12
+                Map = packet.ReadByte(),//13
+                Mode = packet.ReadByte(),//14
+                NaturalMode = packet.ReadUInt32(),//18
+            };
+            //Course = 63, hole repeted = 68, chip-in = 73
+            if (GameData.GameType == GAME_TYPE.HOLE_REPEAT && packet.GetSize == 68)
+            {
+                packet.Skip(5);
+                GameData.HoleNumber = 1;
+                GameData.LockHole = 7;
+                GameData.NaturalMode = 0;
+                GameData.Mode = (byte)TGAME_MODE.GAME_MODE_REPEAT;
+            }
+            if (GameData.GameType == GAME_TYPE.HOLE_REPEAT && packet.GetSize == 63)
+            {
+                GameData.HoleNumber = 0;
+                GameData.LockHole = 0;
+            }
+            packet.ReadPStr(out GameData.Name);
+            packet.ReadPStr(out GameData.Password);
+            packet.ReadUInt32(out GameData.Artifact);
+
+            GameData.GP = false;
+            GameData.GPTypeID = 0;
+            GameData.GPTypeIDA = 0;
+            GameData.GPTime = 0;
+            // { GM Event } && { Chat Room }
+            if (player.GetCapability == 4 && GameData.MaxPlayer >= 100 || GameData.GameType == GAME_TYPE.CHAT_ROOM && player.GetCapability == 4)
+            {
+                GameData.GMEvent = true;
+            }
+
+            var GameHandle = PLobby.CreateGame(player, GameData);
+            if (GameHandle != null)
+            {
+                WriteConsole.WriteLine($"[CREATE ROOM]: GAMERESULT = Sucess, Type: {GameData.GameType}", ConsoleColor.Green);
+            }
+            else
+            {
+                WriteConsole.WriteLine($"[CREATE ROOM]: GAMERESULT = Failed, Type: {GameData.GameType} ", ConsoleColor.Red);
+            }
         }
 
         public void PlayerLeaveGame(GPlayer player)

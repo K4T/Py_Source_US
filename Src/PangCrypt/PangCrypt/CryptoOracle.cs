@@ -1,11 +1,9 @@
-﻿using System;
-namespace PangyaAPI.Crypts
+namespace PangCrypt
 {
-   public class CryptsLib
+    internal static class CryptoOracle
     {
-        //Table 
-        readonly byte[] CryptTable1 =
-       {
+        internal static readonly byte[] CryptTable1 =
+        {
             0x00, 0x01, 0x29, 0x23, 0xBE, 0x84, 0xE1, 0x6C, 0xD6, 0xAE, 0x52, 0x90, 0x49, 0xF1, 0xBB, 0xE9, 0xEB, 0xB3,
             0xA6, 0xDB, 0x3C, 0x87, 0x0C, 0x3E, 0x99, 0x24, 0x5E, 0x0D, 0x1C, 0x06, 0xB7, 0x47, 0xDE, 0x12, 0x4D, 0xC8,
             0x43, 0x8B, 0x1F, 0x03, 0x5A, 0x7D, 0x09, 0x38, 0x25, 0x5D, 0xD4, 0xCB, 0xFC, 0x96, 0xF5, 0x45, 0x3B, 0x13,
@@ -235,9 +233,9 @@ namespace PangyaAPI.Crypts
             0xD9, 0x94, 0xD4, 0x9F, 0x7C, 0x4D, 0x07, 0x46, 0xBC, 0xF7, 0x4E, 0x86, 0xFB, 0x22, 0x12, 0x18, 0xF3, 0x43,
             0x13, 0x4C, 0x2E, 0xEF, 0xE0, 0xB4, 0x8C, 0xF6, 0xE3, 0xAC
         };
-       
-        readonly byte[] CryptTable2 =
-      {
+
+        internal static readonly byte[] CryptTable2 =
+        {
             0x00, 0x01, 0x55, 0x27, 0x9F, 0x90, 0x1D, 0x92, 0xB2, 0x2A, 0x37, 0xAB, 0x16, 0x1B, 0x8C, 0xCF, 0xD8, 0xA5,
             0x21, 0x35, 0x46, 0x91, 0x71, 0xE3, 0x94, 0xF1, 0xF9, 0xD0, 0x1C, 0x73, 0x6F, 0x26, 0x39, 0xDF, 0x4F, 0x03,
             0x19, 0x2C, 0xC6, 0xAF, 0xAA, 0x02, 0x86, 0x8A, 0x58, 0x64, 0xF2, 0xA1, 0x4D, 0xDB, 0x38, 0x7A, 0xCB, 0x80,
@@ -467,136 +465,5 @@ namespace PangyaAPI.Crypts
             0xBD, 0xAE, 0x88, 0x92, 0xB8, 0x9F, 0x59, 0x94, 0x25, 0x61, 0x5D, 0xF9, 0x69, 0x76, 0xCE, 0xF4, 0x71, 0x06,
             0xFD, 0xED, 0xB9, 0xE0, 0x0A, 0xF0, 0x8E, 0x73, 0x6E, 0xCF
         };
-
-        /// <summary>
-        ///     Decrypts data from client-side packets (sent from clients to servers.)
-        /// </summary>
-        /// <param name="source">The encrypted packet data.</param>
-        /// <param name="key">Key to decrypt with.</param>
-        /// <returns>The decrypted packet data.</returns>
-        /// <exception cref="ArgumentOutOfRangeException">
-        ///     Thrown if the key is invalid or the packet data is too short.
-        /// </exception>
-        public byte[] Pangya_Client_Decrypt(byte[] source, byte key)
-        {
-            if (key >= 0x10) throw new ArgumentOutOfRangeException(nameof(key), $"Key too large ({key} >= 0x10)");
-
-            if (source.Length < 5)
-                throw new ArgumentOutOfRangeException(nameof(source), $"Packet too small ({source.Length} < 5)");
-
-            var buffer = (byte[])source.Clone();
-
-            buffer[4] = CryptTable2[(key << 8) + source[0]];
-
-            for (var i = 8; i < buffer.Length; i++) buffer[i] ^= buffer[i - 4];
-
-            var output = new byte[buffer.Length - 5];
-
-            Array.Copy(buffer, 5, output, 0, buffer.Length - 5);
-
-            return output;
-        }
-
-        /// <summary>
-        ///     Encrypts data for client-side packets (sent from clients to servers.)
-        /// </summary>
-        /// <param name="source">The decrypted packet data.</param>
-        /// <param name="key">Key to encrypt with.</param>
-        /// <param name="salt">Random salt value to encrypt with.</param>
-        /// <returns>The encrypted packet data.</returns>
-        /// <exception cref="ArgumentOutOfRangeException">
-        ///     Thrown if an invalid key is specified.
-        /// </exception>
-        public byte[] Pangya_Client_Encrypt(byte[] source, byte key, byte salt)
-        {
-            if (key >= 0x10) throw new ArgumentOutOfRangeException(nameof(key), $"Key too large ({key} >= 0x10)");
-
-            var oracleIndex = (key << 8) + salt;
-            var buffer = new byte[source.Length + 5];
-            var pLen = buffer.Length - 4;
-
-            buffer[0] = salt;
-            buffer[1] = (byte)((pLen >> 0) & 0xFF);
-            buffer[2] = (byte)((pLen >> 8) & 0xFF);
-            buffer[4] = CryptTable2[oracleIndex];
-
-            Array.Copy(source, 0, buffer, 5, source.Length);
-
-            for (var i = buffer.Length - 1; i >= 8; i--) buffer[i] ^= buffer[i - 4];
-
-            buffer[4] ^= CryptTable1[oracleIndex];
-            return buffer;
-        }
-
-        /// <summary>
-        ///     Decrypts data from server-side packets (sent from servers to clients.)
-        /// </summary>
-        /// <param name="source">The encrypted packet data.</param>
-        /// <param name="key">Key to decrypt with.</param>
-        /// <returns>The decrypted packet data.</returns>
-        /// <exception cref="ArgumentOutOfRangeException">
-        ///     Thrown if the key is invalid or the packet data is too short.
-        /// </exception>
-        public byte[] Pangya_Server_Decrypt(byte[] source, byte key)
-        {
-            if (key >= 0x10) throw new ArgumentOutOfRangeException(nameof(key), $"Key too large ({key} >= 0x10)");
-
-            if (source.Length < 8)
-                throw new ArgumentOutOfRangeException(nameof(source), $"Packet too small ({source.Length} < 8)");
-
-            var oracleByte = CryptTable2[(key << 8) + source[0]];
-            var buffer = (byte[])source.Clone();
-
-            buffer[7] ^= oracleByte;
-
-            for (var i = 10; i < source.Length; i++) buffer[i] ^= buffer[i - 4];
-
-            var compressedData = new byte[source.Length - 8];
-            Array.Copy(buffer, 8, compressedData, 0, source.Length - 8);
-            return Lzo.Decompress(compressedData);
-        }
-
-        /// <summary>
-        ///     Encrypts data for server-side packets (sent from servers to clients.)
-        /// </summary>
-        /// <param name="source">The decrypted packet data.</param>
-        /// <param name="key">Key to encrypt with.</param>
-        /// <param name="salt">Random salt value to encrypt with.</param>
-        /// <returns>The encrypted packet data.</returns>
-        /// <exception cref="ArgumentOutOfRangeException">
-        ///     Thrown if an invalid key is specified.
-        /// </exception>
-        public byte[] Pangya_Server_Encrypt(byte[] source, byte key, byte salt)
-        {
-            if (key >= 0x10) throw new ArgumentOutOfRangeException(nameof(key), $"Key too large ({key} >= 0x10)");
-
-            var oracleIndex = (key << 8) + salt;
-            var compressedData = Lzo.Compress(source);
-            var buffer = new byte[compressedData.Length + 8];
-            var pLen = buffer.Length - 3;
-
-            var u = source.Length;
-            var x = (u + u / 255) & 0xff;
-            var v = (u - x) / 255;
-            var y = (v + v / 255) & 0xff;
-            var w = (v - y) / 255;
-            var z = (w + w / 255) & 0xff;
-
-            buffer[0] = salt;
-            buffer[1] = (byte)((pLen >> 0) & 0xFF);
-            buffer[2] = (byte)((pLen >> 8) & 0xFF);
-            buffer[3] = (byte)(CryptTable1[oracleIndex] ^ CryptTable2[oracleIndex]);
-            buffer[5] = (byte)z;
-            buffer[6] = (byte)y;
-            buffer[7] = (byte)x;
-
-            Array.Copy(compressedData, 0, buffer, 8, compressedData.Length);
-
-            for (var i = buffer.Length - 1; i >= 10; i--) buffer[i] ^= buffer[i - 4];
-
-            buffer[7] ^= CryptTable2[oracleIndex];
-
-            return buffer;
-        }
     }
 }

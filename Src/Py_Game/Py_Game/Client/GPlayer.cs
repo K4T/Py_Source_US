@@ -747,7 +747,7 @@ namespace Py_Game.Client
                     break;
                 case TGAMEPACKET.PLAYER_CREATE_GAME:
                     {
-                        new LobbyCoreSystem().PlayerCreateGame(this, packet);
+                        new LobbyCoreSystem().CreateGame(this, packet);
                     }
                     break;
                 case TGAMEPACKET.PLAYER_JOIN_GAME:

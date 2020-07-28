@@ -4,7 +4,7 @@ using Py_Game.Defines;
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
-
+using Action = Py_Game.Client.Inventory.Data.Action;
 namespace Py_Game.Client.Data
 {
     public struct GuildData
@@ -258,7 +258,7 @@ namespace Py_Game.Client.Data
             this.HolePos3D = new Point3D();
             this.Versus = new VersusData();
             this.GameData = new DataGame().Initial();
-            this.Action = new Inventory.Data.Action().Clear();
+            this.Action = new Action().Clear();
             this.Versus.LoadAnimation = false;
             this.Versus.ShotSync = false;
             this.Versus.HoleDistance = 0;
@@ -372,6 +372,24 @@ namespace Py_Game.Client.Data
         public uint ItemPrice { get; set; }
         [field: MarshalAs(UnmanagedType.ByValArray, SizeConst = 0x95)]
         public byte[] Un2 { get; set; }
+    }
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    public struct MapRecord
+    {
+        public TGAME_MAP Map { get; set; }
+        public ushort ID { get; set; }
+        public uint Drive { get; set; }
+        public uint Putt { get; set; }
+        public uint Hole { get; set; }
+        public uint Fairway { get; set; }
+        public uint Holein { get; set; }
+        public uint PuttIn { get; set; }
+        public ushort TotalScore { get; set; }
+        public ushort BestScore { get; set; }
+        public uint MaxPang { get; set; }
+        public uint CharTypeId { get; set; }
+        public ushort EventScore { get; set; }
+        public ushort Assist { get; set; }
     }
 
     public class ShopItemData

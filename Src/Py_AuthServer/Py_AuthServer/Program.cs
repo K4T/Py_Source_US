@@ -1,26 +1,18 @@
-﻿using PangyaAPI;
-using PangyaAPI.Auth;
+﻿using PangyaAPI.Auth;
 using PangyaAPI.Server;
 using PangyaAPI.Tools;
-using Py_Connector.DataBase;
 using System;
 using System.Linq;
-using System.Net.Sockets;
-using System.Threading;
-
 namespace Py_AuthServer
 {
     class Program
     {
         public static AuthServer Server;
-        static PangyaEntities db;
-
         public static string AuthKey { get; set; }
 
         static void Main()
         {
-            db = new PangyaEntities();
-            Console.Title = string.Format("Pangya Fresh Up! AuthServer - LOGIN: {0}, GAMES: {1}, MESSENGER: {2}", 0, 0, 0);
+            Console.Title = "Pangya Fresh Up! AuthServer";
 
             AuthKey = "3493ef7ca4d69f54de682bee58be4f93"; //Unogames em MD5
 
@@ -29,44 +21,10 @@ namespace Py_AuthServer
             Server.Start();
             Server.OnPacketReceived += TcpServer_OnPacketReceived;
 
-            var servers = db.Pangya_Server.Where(c => c.Active == true && c.Port != 7997).ToList();
-            foreach (var _server in servers)
-            {
-                db.Database.SqlQuery<PangyaEntities>($"UPDATE [dbo].[Pangya_Server] Set Active = '{0}' where ServerID = '{_server.ServerID}'").FirstOrDefault();
-            }
             for (; ; )
             {
                 var comando = Console.ReadLine().Split(new char[] { ' ' }, 2);
-                switch (comando[0].ToLower())
-                {
-                    case "": break;
-                    case "notice":
-                        {
-                            var message = comando[1];
-
-                            Server.Send(AuthClientTypeEnum.GameServer, new AuthPacket() { ID = AuthPacketEnum.SERVER_RELEASE_NOTICE, Message = new { mensagem = message } });
-                        }
-                        break;
-                    case "ticket":
-                        {
-                            var message = comando[1];
-
-                            Server.Send(AuthClientTypeEnum.GameServer, new AuthPacket() { ID = AuthPacketEnum.SERVER_RELEASE_TICKET, Message = new { GetNickName = "ADMIN", GetMessage = message } });
-                        }
-                        break;
-                    case "quit":
-                        Console.WriteLine("The server was stopped!");
-                        Environment.Exit(1);
-                        break;
-                    case "limpar":
-                    case "cls":
-                    case "clear":
-                        Console.Clear();
-                        break;
-                    default:
-                        Console.WriteLine("Comando inexistente");
-                        break;
-                }
+                Server.RunCommand(comando);
             }
         }
 
@@ -220,7 +178,7 @@ namespace Py_AuthServer
             {
                 Server.Players.Remove(check.First());
 
-                var member = db.Pangya_Member.FirstOrDefault(c => c.UID == UID);
+                var member = Server.db.Pangya_Member.FirstOrDefault(c => c.UID == UID);
                 if (member != null)
                 {
                     var Player = new APlayer(null) { GetUID = (uint)UID, GetLogin = member.Username, GetNickname = member.Nickname };
@@ -230,7 +188,7 @@ namespace Py_AuthServer
             }
             else
             {
-                var member = db.Pangya_Member.FirstOrDefault(c => c.UID == UID);
+                var member = Server.db.Pangya_Member.FirstOrDefault(c => c.UID == UID);
                 if (member != null)
                 {
                     var Player = new APlayer(null) { GetUID = (uint)UID, GetLogin = member.Username, GetNickname = member.Nickname };
@@ -245,7 +203,7 @@ namespace Py_AuthServer
             int UID = packet.Message.ID;
 
             var check = Server.Players.Model.Where(c => c.GetUID == UID);
-            var member = db.Pangya_Member.FirstOrDefault(c => c.UID == UID);
+            var member = Server.db.Pangya_Member.FirstOrDefault(c => c.UID == UID);
 
             if (check.Any())
             {
@@ -255,7 +213,7 @@ namespace Py_AuthServer
             {
                 member.Logon = 0;
 
-                db.SaveChanges();
+                Server.db.SaveChanges();
 
                 packet.ID = AuthPacketEnum.SEND_DISCONNECT_PLAYER;
                 Server.SendToAll(packet);

@@ -18,9 +18,9 @@ namespace Py_Game.ItemList
 
             try
             {
-                if (File.Exists("Json/BoxRandomData.txt"))
+                if (File.Exists("Json/BoxRandomData.json"))
                 {
-                    var JsonValues = JsonValue.ParseFile("Json/BoxRandomData.txt")["BoxData"].AsJsonArray;
+                    var JsonValues = JsonValue.ParseFile("Json/BoxRandomData.json")["BoxData"].AsJsonArray;
                     foreach (var AMember in JsonValues)
                     {
                         var Box = new TBoxInfo

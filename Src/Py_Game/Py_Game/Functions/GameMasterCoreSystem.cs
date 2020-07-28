@@ -162,7 +162,6 @@ namespace Py_Game.Functions
                         client.SendResponse(new byte[] { 0x76, 0x02, 0xFA, 0x00, 0x00, 0x00 });
 
                         client.Close();
-
                     }
                     break;
                 case GM_COMMAND.Player_Change_GameWind: //Command /wind [spd] [dir] 
@@ -375,7 +374,6 @@ namespace Py_Game.Functions
                 player.Response.WriteUInt64(0);
             }
             player.SendResponse();
-
             player.SendResponse(new byte[] { 0x0F, 0x00 });
         }
 
@@ -404,7 +402,7 @@ namespace Py_Game.Functions
 
             if (!packet.ReadUInt32(out uint PlayerConnection)) { return; }
 
-            var client = (GPlayer)((player.Server)).GetClientByConnectionId(PlayerConnection);
+            var client = player.Lobby.GetPlayerByConnectionId(PlayerConnection);
 
             if (client == null)
                 return;

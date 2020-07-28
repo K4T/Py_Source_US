@@ -10,6 +10,11 @@ using Py_Game.Defines;
 using Py_Game.GameTools;
 using System;
 using System.Configuration;
+using System.IO;
+using Py_Game.Game.Data;
+using System.Runtime.InteropServices;
+using Py_Game.Client.Data;
+using System.Collections.Generic;
 
 namespace Py_Game.MainServer
 {
@@ -100,7 +105,7 @@ namespace Py_Game.MainServer
             }
         }
 
-        internal static bool CheckVersion(string version)
+        public static bool CheckVersion(string version)
         {
             if (_server.Data.GameVersion == version || version == "824.00"  || version == "852.00")
             { 

@@ -27,11 +27,13 @@ namespace Py_Game.Client
                 return result.GetBytes();
             }
         }
-
+        /// <summary>
+        /// return 239 bytes
+        /// </summary>
+        /// <returns></returns>
         public byte[] Statistic()
         {
             PangyaBinaryWriter result;
-
             result = new PangyaBinaryWriter();
             result.WriteUInt32(UserStatistic.Drive);
             result.WriteUInt32(UserStatistic.Putt);
@@ -118,8 +120,7 @@ namespace Py_Game.Client
                 Reply.WriteStr(GetLogin, 22);
                 Reply.WriteStr(GetNickname, 22);
                 Reply.WriteStr(GuildInfo.Name, 17);
-                Reply.WriteStr(GuildInfo.Image, 12);
-                Reply.WriteZero(4);
+                Reply.WriteStr(GuildInfo.Image, 16);
                 Reply.WriteUInt64(GetCapability);
                 Reply.WriteUInt32(ConnectionID);
                 Reply.WriteZero(12);
@@ -279,34 +280,6 @@ namespace Py_Game.Client
             Response.WriteUInt32(Server.Data.Property); // Grand Prix 2048, normal 0, 256 ?
             Response.Write(GetGuildInfo());
             SendResponse();
-        }
-
-        /// <summary>
-        /// Is Test Achivement
-        /// </summary>
-        /// <param name="TypeID"></param>
-        /// <param name="Count"></param>
-        public void AddAchivementQuest(uint TypeID, uint Count)
-        {
-            Achievements.Add(new TAchievement()
-            {
-                ID = (uint)1,
-                TypeID = (uint)TypeID,
-                AchievementType = 1
-            });
-            AchievemetCounters.Add((uint)1, new TAchievementCounter() { ID = (uint)1, TypeID = TypeID, Quantity = 1 });
-
-            var Quest = new TAchievementQuest
-            {
-                ID = (uint)1,
-                AchievementIndex = (uint)1,
-                AchievementTypeID = (uint)TypeID,
-                CounterIndex = (uint)1,
-                SuccessDate = (uint)Tools.UnixTimeConvert(DateTime.Now),
-                Total = (uint)1
-            };
-
-            this.AchievementQuests.Add(Quest);
         }
 
 

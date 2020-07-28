@@ -496,7 +496,7 @@
         UPDATE = 3, //update player
         LIST = 4, //list players
     }
-    public enum TGAME_MAP
+    public enum TGAME_MAP : byte
     {
         Blue_Lagoon = 0x00,
         Blue_Water = 0x01,

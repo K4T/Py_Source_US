@@ -3,26 +3,28 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30011.22
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Py_Game", "Src\Py_Game\Py_Game\Py_Game.csproj", "{17A534FF-EF1F-4D2E-9739-EBBE99612602}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Game", "Src\Py_Game\Py_Game\Game.csproj", "{17A534FF-EF1F-4D2E-9739-EBBE99612602}"
 	ProjectSection(ProjectDependencies) = postProject
 		{A53A1B9A-46E2-453A-BD76-F2D82B710CEC} = {A53A1B9A-46E2-453A-BD76-F2D82B710CEC}
 		{9351C3B8-97E1-49EC-A103-AC006B3FB2CF} = {9351C3B8-97E1-49EC-A103-AC006B3FB2CF}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Py_Connector", "Src\Py_Connector\Py_Connector\Py_Connector.csproj", "{9351C3B8-97E1-49EC-A103-AC006B3FB2CF}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Connector", "Src\Py_Connector\Py_Connector\Connector.csproj", "{9351C3B8-97E1-49EC-A103-AC006B3FB2CF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Py_AuthServer", "Src\Py_AuthServer\Py_AuthServer\Py_AuthServer.csproj", "{9497BCC9-3167-42EB-B3F9-78185EFE953C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuthServer", "Src\Py_AuthServer\Py_AuthServer\AuthServer.csproj", "{9497BCC9-3167-42EB-B3F9-78185EFE953C}"
 	ProjectSection(ProjectDependencies) = postProject
 		{A53A1B9A-46E2-453A-BD76-F2D82B710CEC} = {A53A1B9A-46E2-453A-BD76-F2D82B710CEC}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PangyaAPI", "Src\PangyaAPI\PangyaAPI\PangyaAPI.csproj", "{A53A1B9A-46E2-453A-BD76-F2D82B710CEC}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PangAPI", "Src\PangyaAPI\PangyaAPI\PangAPI.csproj", "{A53A1B9A-46E2-453A-BD76-F2D82B710CEC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Py_Login", "Src\Py_Login\Py_Login\Py_Login.csproj", "{54383325-24CF-4395-BC3F-D0E6338BD1D7}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Login", "Src\Py_Login\Py_Login\Login.csproj", "{54383325-24CF-4395-BC3F-D0E6338BD1D7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PangyaFileCore", "Src\PangyaFileCore\PangyaFileCore.csproj", "{6B47B60C-20BC-448C-8ECA-114749FAF412}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PangFileCore", "Src\PangyaFileCore\PangFileCore.csproj", "{6B47B60C-20BC-448C-8ECA-114749FAF412}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Py_Messenger", "Src\Py_Messenger\Py_Messenger\Py_Messenger.csproj", "{45CA7222-A8FC-4710-8B09-3712F7416619}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Messenger", "Src\Py_Messenger\Py_Messenger\Messenger.csproj", "{45CA7222-A8FC-4710-8B09-3712F7416619}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PangCrypt", "Src\PangCrypt\PangCrypt\PangCrypt.csproj", "{0D37F682-4AE6-4768-A062-8BFF40F478A7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -58,6 +60,10 @@ Global
 		{45CA7222-A8FC-4710-8B09-3712F7416619}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{45CA7222-A8FC-4710-8B09-3712F7416619}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{45CA7222-A8FC-4710-8B09-3712F7416619}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0D37F682-4AE6-4768-A062-8BFF40F478A7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0D37F682-4AE6-4768-A062-8BFF40F478A7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0D37F682-4AE6-4768-A062-8BFF40F478A7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0D37F682-4AE6-4768-A062-8BFF40F478A7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

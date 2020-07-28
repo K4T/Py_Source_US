@@ -13,7 +13,7 @@ namespace Py_Game.Game.Collection
         #region Private Fields      
         Channel _lobby { get; set; }
         ushort GameID { get; set; }
-        public uint Max { get { return 10; } }
+        public bool Limit { get { return this.Count >= 10; } }
         #endregion
 
         #region Construtor
@@ -28,7 +28,7 @@ namespace Py_Game.Game.Collection
         #endregion
         public void Create(GameBase game)
         {
-            if (this.Count >= Max)
+            if (Limit)
             {
                 game.Send(TGAME_CREATE_RESULT.CREATE_GAME_CANT_CREATE.ShowRoomError());
                 return;

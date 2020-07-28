@@ -40,7 +40,7 @@ namespace Py_Login.MainServer
 
                 _server = new TcpListener(IPAddress.Parse(Data.IP), (int)Data.Port);
 
-                OpenServer = true;
+                OpenServer = false;
             }
             catch (Exception erro)
             {
@@ -277,6 +277,16 @@ namespace Py_Login.MainServer
                 case "help":
                     {
                         ShowHelp();
+                    }
+                    break;
+                case "quit":
+                case "exit":
+                case "close":
+                case "sair":
+                case "fechar":
+                    {
+                        Console.WriteLine("The server was stopped!");
+                        Environment.Exit(1);
                     }
                     break;
                 default:

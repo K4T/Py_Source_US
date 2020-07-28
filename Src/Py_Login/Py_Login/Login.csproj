@@ -5,11 +5,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{45CA7222-A8FC-4710-8B09-3712F7416619}</ProjectGuid>
+    <ProjectGuid>{54383325-24CF-4395-BC3F-D0E6338BD1D7}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Py_Messenger</RootNamespace>
-    <AssemblyName>Messenger</AssemblyName>
+    <RootNamespace>Py_Login</RootNamespace>
+    <AssemblyName>Login</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -51,8 +51,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>
-    </ApplicationIcon>
+    <ApplicationIcon>icon.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
@@ -75,19 +74,23 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Client\Data\PlayerData.cs" />
-    <Compile Include="Client\HandlePlayerPacket.cs" />
-    <Compile Include="Client\MPlayer.cs" />
-    <Compile Include="Client\MPlayerSets.cs" />
-    <Compile Include="CreatePacket\PacketCreator.cs" />
-    <Compile Include="Defines\PangyaEnums.cs" />
-    <Compile Include="MainServer\MessengerServer.cs" />
+    <Compile Include="Defines\PangyaPacketsEnum.cs" />
+    <Compile Include="Properties\GlobalSuppressions.cs" />
+    <Compile Include="LoginServerTcp.cs">
+      <DependentUpon>LPlayer.cs</DependentUpon>
+    </Compile>
+    <Compile Include="LPlayer.cs">
+      <DependentUpon>Program.cs</DependentUpon>
+    </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config">
       <SubType>Designer</SubType>
+    </None>
+    <None Include="Config\Login.ini">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="packages.config">
       <DependentUpon>App.config</DependentUpon>
@@ -102,13 +105,13 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Py_Connector\Py_Connector\Py_Connector.csproj">
+    <ProjectReference Include="..\..\Py_Connector\Py_Connector\Connector.csproj">
       <Project>{9351c3b8-97e1-49ec-a103-ac006b3fb2cf}</Project>
-      <Name>Py_Connector</Name>
+      <Name>Connector</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\PangyaAPI\PangyaAPI\PangyaAPI.csproj">
+    <ProjectReference Include="..\..\PangyaAPI\PangyaAPI\PangAPI.csproj">
       <Project>{a53a1b9a-46e2-453a-bd76-f2d82b710cec}</Project>
-      <Name>PangyaAPI</Name>
+      <Name>PangAPI</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

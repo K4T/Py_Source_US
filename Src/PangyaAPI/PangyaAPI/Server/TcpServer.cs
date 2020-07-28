@@ -15,6 +15,7 @@ namespace PangyaAPI.Server
     {
         #region Delegates
         public delegate void ConnectedEvent(Player player);
+        public delegate void DisconnectEvent(Player player);
         public delegate void PacketReceivedEvent(Player player, Packet packet);
         #endregion
 
@@ -23,6 +24,11 @@ namespace PangyaAPI.Server
         /// Este evento ocorre quando o ProjectG se conecta ao Servidor
         /// </summary>
         public event ConnectedEvent OnClientConnected;
+
+        /// <summary>
+        /// Este evento ocorre quando o ProjectG fecha ou disconecta o client
+        /// </summary>
+        public event DisconnectEvent OnClientDisconnect;
 
         /// <summary>
         /// Este evento ocorre quando o Servidor Recebe um Packet do ProjectG
@@ -40,7 +46,7 @@ namespace PangyaAPI.Server
 
         public uint NextConnectionId { get; set; } = 1;
 
-        public TcpListener _server;      
+        public TcpListener _server;
 
         public bool _isRunning;
 
@@ -48,7 +54,7 @@ namespace PangyaAPI.Server
 
         public ServerSettings Data;
 
-       public bool ShowLog { get; set; }
+        public bool ShowLog { get; set; }
 
         public DateTime EndTime { get; set; }
 
@@ -67,7 +73,7 @@ namespace PangyaAPI.Server
         /// </summary>
         /// <param name="tcp"></param>
         protected abstract Player OnConnectPlayer(TcpClient tcp);
-        protected abstract void ServerExpection(Player Client,Exception Ex);
+        protected abstract void ServerExpection(Player Client, Exception Ex);
 
         public abstract void DisconnectPlayer(Player Player);
 
@@ -171,11 +177,8 @@ namespace PangyaAPI.Server
 
             var Player = OnConnectPlayer(tcpClient);
 
-            var thread = new Thread(new ThreadStart(Player.RefreshData));
-            thread.Start();
-
             //Chama evento OnClientConnected
-            this.OnClientConnected?.Invoke(Player);
+            PlayerConnect(Player);
 
             while (Player.Connected)
             {
@@ -193,19 +196,21 @@ namespace PangyaAPI.Server
                                 packet.Log();
                             }
                             //Dispara evento OnPacketReceived
-                            OnPacketReceived?.Invoke(Player, packet: packet);
+                            PlayerRequestPacket(Player,packet);
                         }
                     }
                     else
                     {
                         if (Player.Connected)
                         {
+                            OnClientDisconnect?.Invoke(Player);
                             DisconnectPlayer(Player);
                         }
                     }
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
+                    OnClientDisconnect?.Invoke(Player);
                     ServerExpection(Player, ex);
                 }
             }
@@ -213,7 +218,7 @@ namespace PangyaAPI.Server
                 DisconnectPlayer(Player);
         }
 
-       protected byte[] ReceivePacket(NetworkStream Stream)
+        protected byte[] ReceivePacket(NetworkStream Stream)
         {
             int bytesRead = 0;
             byte[] message, messageBufferRead = new byte[500000]; //Tamanho do BUFFER á ler             
@@ -238,6 +243,16 @@ namespace PangyaAPI.Server
             }
         }
 
+        protected void PlayerConnect(Player player)
+        {
+            this.OnClientConnected?.Invoke(player);
+            player.Handle();
+        }
+
+        protected void PlayerRequestPacket(Player player, Packet packet)
+        {
+            OnPacketReceived?.Invoke(player, packet);
+        }
         #endregion
 
         #region Public Methods
@@ -263,20 +278,20 @@ namespace PangyaAPI.Server
         public void ShowHelp()
         {
             Console.WriteLine(Environment.NewLine);
-            WriteConsole.WriteLine("Welcome To Py-Server!" + Environment.NewLine);
+            WriteConsole.WriteLine("Welcome To Pangya-Server!" + Environment.NewLine);
 
             WriteConsole.WriteLine("See available console commands:" + Environment.NewLine);
 
             WriteConsole.WriteLine("help      | Displays console commands");
             WriteConsole.WriteLine("topnotice | Displays message to users who are playing Game");
-            WriteConsole.WriteLine("kickuser  | Disconnect by UserName");
-            WriteConsole.WriteLine("kicknick  | Disconnect by Nick");
-            WriteConsole.WriteLine("kickuid   | Disconnect by UID");
+            WriteConsole.WriteLine("kickuser  | Disconnect by UserName");// kickuid luismk
+            WriteConsole.WriteLine("kicknick  | Disconnect by Nick");// kickuid MK(e48)
+            WriteConsole.WriteLine("kickuid   | Disconnect by UID");// kickuid 1 
             WriteConsole.WriteLine("clear     | Clear Console");
             WriteConsole.WriteLine("cls       | Clear console");
             WriteConsole.WriteLine("quit      | Close By Server");
-            WriteConsole.WriteLine("Start     | Open Server");
-            WriteConsole.WriteLine("Stop      | Close Server");
+            WriteConsole.WriteLine("Start     | Open Server");//opens the server if it is undergoing maintenance
+            WriteConsole.WriteLine("Stop      | Close Server");//closes the server for maintenance
 
             Console.WriteLine(Environment.NewLine);
         }

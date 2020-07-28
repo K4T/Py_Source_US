@@ -118,79 +118,11 @@ namespace Py_Game.Lobby
             return Games.GetByID(GameID);
         }
 
-        public GPlayer GetPlayerByConnectionId(UInt32 ConnectionId)
+        public GPlayer GetPlayerByConnectionId(uint ConnectionId)
         {
-            foreach (GPlayer Client in Players.Model)
-            {
-                if (Client.ConnectionID == ConnectionId)
-                {
-                    return Client;
-                }
-            }
-            return null;
+           return (GPlayer)MainServer.Program._server.GetClientByConnectionId(ConnectionId);
         }
-        //02 : The Room is full
-        //03 : The Room is not exist
-        //04 : wrong password
-        //05 : you cannot get in this room level
-        //07 : can not create game
-        //08 : game is in progress
-        public void PlayerCreateGame(GPlayer player, Packet packet)
-        {
-            GameInformation GameData;
-
-            GameData = new GameInformation
-            {
-                Unknown1 = packet.ReadByte(),//1
-                VSTime = packet.ReadUInt32(),//5/
-                GameTime = packet.ReadUInt32(),//9
-                MaxPlayer = packet.ReadByte(),//10
-                GameType = (GAME_TYPE)packet.ReadByte(),//11
-                HoleTotal = packet.ReadByte(),//12
-                Map = packet.ReadByte(),//13
-                Mode = packet.ReadByte(),//14
-                NaturalMode = packet.ReadUInt32(),//18
-            };
-
-            //Course = 63, hole repeted = 68, chip-in = 73
-            if (GameData.GameType == GAME_TYPE.HOLE_REPEAT && packet.GetSize == 68)
-            {
-                packet.Skip(5);
-                GameData.HoleNumber = 1;
-                GameData.LockHole = 7;
-                GameData.NaturalMode = 0;
-                GameData.Mode = (byte)TGAME_MODE.GAME_MODE_REPEAT;
-            }
-            if (GameData.GameType == GAME_TYPE.HOLE_REPEAT && packet.GetSize == 63)
-            {
-                GameData.HoleNumber = 0;
-                GameData.LockHole = 0;
-            }
-            packet.ReadPStr(out GameData.Name);
-            packet.ReadPStr(out GameData.Password);
-            packet.ReadUInt32(out GameData.Artifact);
-
-            GameData.GP = false;
-            GameData.GPTypeID = 0;
-            GameData.GPTypeIDA = 0;
-            GameData.GPTime = 0;
-            // { GM Event } && { Chat Room }
-            if (player.GetCapability == 4 && GameData.MaxPlayer >= 100 || GameData.GameType == GAME_TYPE.CHAT_ROOM && player.GetCapability == 4)
-            {
-                GameData.GMEvent = true;
-            }
-
-            var GameHandle = CreateGame(player, GameData);
-            if (GameHandle != null)
-            {
-                WriteConsole.WriteLine($"[CREATE ROOM]: GAMERESULT = Sucess, Type: {GameData.GameType}", ConsoleColor.Green);
-            }
-            else
-            {
-                WriteConsole.WriteLine($"[CREATE ROOM]: GAMERESULT = Failed, Type: {GameData.GameType} ", ConsoleColor.Red);
-            }
-        }
-
+       
         public void PlayerJoinGrandPrix(GPlayer player, Packet packet)
         {
             DateTime ReDate(DateTime GPDate)
@@ -386,9 +318,9 @@ namespace Py_Game.Lobby
 
         internal GameBase CreateGame(GPlayer player, GameInformation GameData)
         {
-            if (Games.Count >= 10)
+            if (Games.Limit)
             {
-                player.SendResponse(TGAME_CREATE_RESULT.CREATE_GAME_CREATE_FAILED.ShowRoomError());
+                player.SendResponse(TGAME_CREATE_RESULT.CREATE_GAME_CREATE_FAILED2.ShowRoomError());
                 return null;
             }
 
@@ -399,7 +331,6 @@ namespace Py_Game.Lobby
                 case GAME_TYPE.VERSUS_STROKE:
                 case GAME_TYPE.VERSUS_MATCH:
                     {
-                        player.SendResponse(TGAME_CREATE_RESULT.CREATE_GAME_CANT_CREATE.ShowRoomError());
                     }
                     break;
                 case GAME_TYPE.CHAT_ROOM:
@@ -414,17 +345,14 @@ namespace Py_Game.Lobby
                     break;
                 case GAME_TYPE.TOURNEY:
                     {
-                     //   result = new Torney(player, GameData, CreateGameEvent, UpdateGameEvent, DestroyGame, PlayerJoinGameEvent, PlayerLeaveGameEvent, Games.GetID);
                     }
                     break;
                 case GAME_TYPE.TOURNEY_TEAM:
                     {
-                        player.SendResponse(TGAME_CREATE_RESULT.CREATE_GAME_CANT_CREATE.ShowRoomError());
                     }
                     break;
                 case GAME_TYPE.TOURNEY_GUILD:
                     {
-                        player.SendResponse(TGAME_CREATE_RESULT.CREATE_GAME_CANT_CREATE.ShowRoomError());
                     }
                     break;
                 case GAME_TYPE.PANG_BATTLE:
@@ -434,12 +362,10 @@ namespace Py_Game.Lobby
                     break;
                 case GAME_TYPE.GAME_TYPE_08:
                     {
-                        player.SendResponse(TGAME_CREATE_RESULT.CREATE_GAME_CANT_CREATE.ShowRoomError());
                     }
                     break;
                 case GAME_TYPE.GAME_TYPE_09:
                     {
-                        player.SendResponse(TGAME_CREATE_RESULT.CREATE_GAME_CANT_CREATE.ShowRoomError());
                     }
                     break;
                 case GAME_TYPE.GAME_APROACH:
@@ -449,42 +375,34 @@ namespace Py_Game.Lobby
                     break;
                 case GAME_TYPE.GM_EVENT:
                     {
-                      ///  result = new GMEvent(player, GameData, CreateGameEvent, UpdateGameEvent, DestroyGame, PlayerJoinGameEvent, PlayerLeaveGameEvent, Games.GetID);
                     }
                     break;
                 case GAME_TYPE.GAME_TYPE_0C:
                     {
-                        player.SendResponse(TGAME_CREATE_RESULT.CREATE_GAME_CANT_CREATE.ShowRoomError());
                     }
                     break;
                 case GAME_TYPE.GAME_ZOD_OFF:
                     {
-                        player.SendResponse(TGAME_CREATE_RESULT.CREATE_GAME_CANT_CREATE.ShowRoomError());
                     }
                     break;
                 case GAME_TYPE.CHIP_IN_PRACTICE:
                     {
-                      //  result = new PracticeChip(player, GameData, CreateGameEvent, UpdateGameEvent, DestroyGame, PlayerJoinGameEvent, PlayerLeaveGameEvent, Games.GetID);
                     }
                     break;
                 case GAME_TYPE.GAME_TYPE_0F:
                     {
-                        player.SendResponse(TGAME_CREATE_RESULT.CREATE_GAME_CANT_CREATE.ShowRoomError());
                     }
                     break;
                 case GAME_TYPE.GAME_TYPE_10:
                     {
-                        player.SendResponse(TGAME_CREATE_RESULT.CREATE_GAME_CANT_CREATE.ShowRoomError());
                     }
                     break;
                 case GAME_TYPE.GAME_TYPE_11:
                     {
-                        player.SendResponse(TGAME_CREATE_RESULT.CREATE_GAME_CANT_CREATE.ShowRoomError());
                     }
                     break;
                 case GAME_TYPE.SSC:
                     {
-                        player.SendResponse(TGAME_CREATE_RESULT.CREATE_GAME_CANT_CREATE.ShowRoomError());
                     }
                     break;
                 case GAME_TYPE.HOLE_REPEAT:
@@ -494,7 +412,6 @@ namespace Py_Game.Lobby
                     break;
                 case GAME_TYPE.GRANDPRIX:
                     {
-                       // result = new GrandPrix(player, GameData, CreateGameEvent, UpdateGameEvent, DestroyGame, PlayerJoinGameEvent, PlayerLeaveGameEvent, Games.GetID);
                     }
                     break;
             }

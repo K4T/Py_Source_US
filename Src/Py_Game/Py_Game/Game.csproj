@@ -194,25 +194,46 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <None Include="Config\Channel.ini">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Config\Game.ini">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Json\BlackPapelData.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Json\MemorialNormalData.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Json\MemorialRareItemData.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Json\ScratchCard.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\PangyaFileCore\PangyaFileCore.csproj">
+    <ProjectReference Include="..\..\PangyaFileCore\PangFileCore.csproj">
       <Project>{6B47B60C-20BC-448C-8ECA-114749FAF412}</Project>
-      <Name>PangyaFileCore</Name>
+      <Name>PangFileCore</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\PangyaAPI\PangyaAPI\PangyaAPI.csproj">
+    <ProjectReference Include="..\..\PangyaAPI\PangyaAPI\PangAPI.csproj">
       <Project>{a53a1b9a-46e2-453a-bd76-f2d82b710cec}</Project>
-      <Name>PangyaAPI</Name>
+      <Name>PangAPI</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\Py_Connector\Py_Connector\Py_Connector.csproj">
+    <ProjectReference Include="..\..\Py_Connector\Py_Connector\Connector.csproj">
       <Project>{9351c3b8-97e1-49ec-a103-ac006b3fb2cf}</Project>
-      <Name>Py_Connector</Name>
+      <Name>Connector</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Content Include="AppIcon\control.ico" />
     <Content Include="AppIcon\icon.ico" />
+    <None Include="Json\BoxRandomData.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.6.1">
