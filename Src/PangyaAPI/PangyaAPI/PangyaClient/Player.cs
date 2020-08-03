@@ -53,7 +53,9 @@ namespace PangyaAPI.PangyaClient
         public byte GetLevel { get; set; } = 0;
         public string GetAuth1 { get; set; } = String.Empty;
         public string GetAuth2 { get; set; } = String.Empty;
-
+        /// <summary>
+        /// IP Adress Client
+        /// </summary>
         public string GetAddress
         {
             get { return ((IPEndPoint)Tcp.Client.RemoteEndPoint).Address.ToString(); }
@@ -153,7 +155,7 @@ namespace PangyaAPI.PangyaClient
         }
         public void Send(byte[] Data)
         {
-            var buffer = Encrypt(Data,GetKey, 0);
+            var buffer = Encrypt(Data, GetKey, 0);
 
             SendBytes(buffer);
         }
@@ -163,17 +165,14 @@ namespace PangyaAPI.PangyaClient
             if (Tcp.Connected && Connected)
             {
                 Tcp.GetStream().Write(buffer, 0, buffer.Length);
+                Tcp.GetStream().Flush();
             }
-            Thread.Sleep(5000);
         }
 
         public void Handle()
         {
-            var thread = new Thread(new ThreadStart(RefreshData));
-            thread.Start();
-
-            var keepAliveThread = new Thread(new ThreadStart(KeepAlive));
-            keepAliveThread.Start();
+            new Thread(new ThreadStart(KeepAlive)).Start();
+            new Thread(new ThreadStart(RefreshData)).Start();
         }
 
         /// <summary>

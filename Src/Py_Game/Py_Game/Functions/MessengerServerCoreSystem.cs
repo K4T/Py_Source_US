@@ -10,11 +10,8 @@ namespace Py_Game.Functions
     {
         public void PlayerCallMessengerServer(GPlayer PL)
         {
-            if (Program._server.Messenger_Active)
-            {
-                PL.SendResponse(new byte[] { 0xF1, 0x00, 0x00 });
-                PL.SendResponse(new byte[] { 0x35, 0x01 });
-            }
+            PL.SendResponse(new byte[] { 0xF1, 0x00, 0x00 });
+            PL.SendResponse(new byte[] { 0x35, 0x00 });
         }
 
         public void PlayerConnectMessengerServer(GPlayer PL)

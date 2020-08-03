@@ -19,7 +19,7 @@ namespace Py_Game.Functions
     }
     public class ItemRecycleCoreSystem
     {
-        public void PlayerRecycleItem(GPlayer player, Packet packet)
+        public ItemRecycleCoreSystem(GPlayer player, Packet packet)
         {
             uint MP = 436208295,
                 TikiPang = 0,
@@ -106,8 +106,6 @@ namespace Py_Game.Functions
             {
                 player.Close();
             }
-
-          
         }
 
         static TITEMGROUP GetItemGroup(uint TypeID)

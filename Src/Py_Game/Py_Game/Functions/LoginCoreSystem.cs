@@ -179,10 +179,6 @@ namespace Py_Game.Functions
             PL.SendAchievement();
             #endregion
 
-            #region Call Messeger Server
-            new MessengerServerCoreSystem().PlayerCallMessengerServer(PL);
-            #endregion
-
             #region PlayerCardInfo
             PL.SendResponse(Inventory.ItemCard.Build());
 
@@ -200,29 +196,15 @@ namespace Py_Game.Functions
             #endregion
 
             #region TROPHY
-            Reply = new PangyaBinaryWriter();
-            Reply.Write(Inventory.ItemTrophies.Build(5));
-            PL.SendResponse(Reply.GetBytes());
-
-            Reply = new PangyaBinaryWriter();
-            Reply.Write(Inventory.ItemTrophies.Build(0));
-            PL.SendResponse(Reply.GetBytes());
-
-            Reply = new PangyaBinaryWriter();
-            Reply.Write(Inventory.ItemTrophySpecial.Build(5));
-            PL.SendResponse(Reply.GetBytes());
-
-            Reply = new PangyaBinaryWriter();
-            Reply.Write(Inventory.ItemTrophySpecial.Build(0));
-            PL.SendResponse(Reply.GetBytes());
-
-            Reply = new PangyaBinaryWriter();
-            Reply.Write(Inventory.ItemTrophyGP.Build(5));
-            PL.SendResponse(Reply.GetBytes());
-
-            Reply = new PangyaBinaryWriter();
-            Reply.Write(Inventory.ItemTrophyGP.Build(0));
-            PL.SendResponse(Reply.GetBytes());
+            //normal
+            PL.SendResponse(Inventory.ItemTrophies.Build(5));
+            PL.SendResponse(Inventory.ItemTrophies.Build(0));
+            //especial
+            PL.SendResponse(Inventory.ItemTrophySpecial.Build(5));
+            PL.SendResponse(Inventory.ItemTrophySpecial.Build(0));
+            //Grand Prix
+            PL.SendResponse(Inventory.ItemTrophyGP.Build(5));
+            PL.SendResponse(Inventory.ItemTrophyGP.Build(0));
             #endregion
 
             #region StatisticInfo
@@ -238,7 +220,7 @@ namespace Py_Game.Functions
             #endregion
 
             #region ChatOffLine
-            // PL.SendChatOffline();
+            PL.SendChatOffline();
             #endregion
 
             #region Check Exist Item 467664918
@@ -254,6 +236,9 @@ namespace Py_Game.Functions
 
         public void SendJunkPackets(GPlayer PL)
         {
+
+            PL.SendResponse(ShowKeepLive());
+
             PL.SendResponse(new byte[] { 0x44, 0x00, 0xD3, 0x00 });
 
             PL.SendResponse(ShowLoadServer(0x01));

@@ -205,30 +205,18 @@ namespace Py_Game.Client
                     break;
                 case TGAMEPACKET.PLAYER_KEEPLIVE:
                     {
-                        this.Send(new byte[] { 0x0E, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 });
                     }
                     break;
                 case TGAMEPACKET.PLAYER_EXCEPTION:
                     {
-                        var Code = packet.ReadByte();
-                        var msg = packet.ReadPStr();
                         using (var FileWrite = new StreamWriter("PlayerException.txt", true))
                         {
                             FileWrite.WriteLine($"--------------------------- PLAYER_EXCEPTION ------------------------------------------");
                             FileWrite.WriteLine($"Date: {DateTime.Now}");
-                            FileWrite.WriteLine($"Player_Info: {GetLogin}, ID {GetUID}");
-                            FileWrite.WriteLine("ID_ERROR: " + Code);
-                            FileWrite.WriteLine("Message: " + msg);
+                            FileWrite.WriteLine($"Player({GetLogin}), Index({GetUID})");
+                            FileWrite.WriteLine($"Message: {packet.Message.HexDump()}}");
                             FileWrite.WriteLine($"------------------------------- END ---------------------------------------------------");
                         }
-
-                        Response = new PangyaBinaryWriter();
-                        //Gera Packet com chave de criptografia (posisão 8)
-                        Response.Write(new byte[] { 0x00, 0x06, 0x00, 0x00, 0x3f, 0x00, 0x01, 0x01 });
-                        Response.WriteByte(GetKey);
-                        SendBytes(Response.GetBytes());
-                        Response.Clear();
-
                         this.Server.DisconnectPlayer(this);
                     }
                     break;
@@ -700,16 +688,7 @@ namespace Py_Game.Client
                 #region Achievement System
                 case TGAMEPACKET.PLAYER_CALL_ACHIEVEMENT:
                     {
-                        string fileDir = @"C:\SendAchievements\";
-                        var PacketAchievements = File.ReadAllBytes(fileDir + "CompressAchievements.hex");
-
-                        if (PacketAchievements.Count() == 0)
-                        {
-                            return;
-                        }
-
-                        SendBytes(PacketAchievements);
-                        // new AchievementCoreSystem().PlayerGetAchievement(this, packet);
+                         new AchievementCoreSystem().PlayerGetAchievement(this, packet);
                     }
                     break;
                 #endregion
@@ -837,7 +816,7 @@ namespace Py_Game.Client
                 #endregion
                 case TGAMEPACKET.PLAYER_RECYCLE_ITEM:
                     {
-                        new ItemRecycleCoreSystem().PlayerRecycleItem(this, packet);
+                        new ItemRecycleCoreSystem(this, packet);
                     }
                     break;
                 case TGAMEPACKET.PLAYER_REQUEST_CHAT_OFFLINE:
@@ -850,7 +829,7 @@ namespace Py_Game.Client
                     {
                         WriteConsole.WriteLine($"[PLAYER_CALL_PACKET_UNKNOWN]: [{PacketID},{GetLogin}]", ConsoleColor.Red);
                         //anula qualquer pacote id não mencionado ou não identificado
-                        //Send(PacketCreator.ShowCancelPacket());
+                        Send(PacketCreator.ShowCancelPacket());
                         packet.Save();
                     }
                     break;

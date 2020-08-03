@@ -3,6 +3,7 @@ using Py_Game.Client.Data;
 using Py_Game.Functions;
 using Py_Game.GameTools;
 using System;
+using System.IO;
 
 namespace Py_Game.Client
 {
@@ -308,9 +309,9 @@ namespace Py_Game.Client
             Packet.Write(0);
             Packet.WriteInt32(AchievemetCounters.Count);
             Packet.WriteInt32(AchievemetCounters.Count);
-            foreach (var Achievement in this.Achievements)
+            foreach (var Achievement in Achievements)
             {
-                Packet.Write((byte)1);
+                Packet.WriteByte(1);
                 Packet.WriteUInt32(Achievement.TypeID);
                 Packet.WriteUInt32(Achievement.ID);
                 Packet.WriteUInt32(Achievement.AchievementType);
@@ -456,20 +457,24 @@ namespace Py_Game.Client
                 Packet.Dispose();
             }
         }
-
+        /// <summary>
+        /// Envia Chave de conexao
+        /// </summary>
         public void SendKey()
         {
             try
             {
                 if (Tcp.Connected && Connected)
                 {
+                    var result = new PangyaBinaryWriter(new MemoryStream());
 
-                    Response = new PangyaBinaryWriter();
-                    //Gera Packet com chave de criptografia (posisão 8)
-                    Response.Write(new byte[] { 0x00, 0x06, 0x00, 0x00, 0x3f, 0x00, 0x01, 0x01 });
-                    Response.WriteByte(GetKey);
-                    SendBytes(Response.GetBytes());
-                    Response.Clear();
+                    result = new PangyaBinaryWriter();
+                    result.WriteByte(0);
+                    result.WriteUInt16(GetAddress.Length + 8);
+                    result.Write(new byte[] { 0x00, 0x3f, 0x00, 0x01, 0x01 });
+                    result.WriteByte(GetKey);
+                    result.WritePStr(GetAddress);
+                    SendBytes(result.GetBytes());
                 }
             }
             catch

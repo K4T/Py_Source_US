@@ -16,7 +16,6 @@ namespace Py_Game.Lobby.Collection
         [MethodImpl(MethodImplOptions.NoInlining)]
         public ChannelCollection(IniFile Ini)
         {
-            //GameInformation gameInfo;
             byte i;
             try
             {
@@ -38,7 +37,6 @@ namespace Py_Game.Lobby.Collection
                 if (Ini != null)
                     Ini.Dispose();
             }
-
             WriteConsole.WriteLine("[SERVER_SYSTEM_CHANNEL]: Canais foram carregados !", ConsoleColor.Green);
         }
         public byte[] Build(bool IsBuild = false)
