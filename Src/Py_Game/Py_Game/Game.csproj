@@ -104,7 +104,6 @@
     <Compile Include="Client\Inventory\Collection\WarehouseCollection.cs" />
     <Compile Include="Client\Inventory\Data\AddItem.cs" />
     <Compile Include="Client\Inventory\Data\ItemSlotData.cs" />
-    <Compile Include="Client\Inventory\Data\PlayerAction.cs" />
     <Compile Include="Client\Inventory\Data\PlayerCaddieData.cs" />
     <Compile Include="Client\Inventory\Data\PlayerCardData.cs" />
     <Compile Include="Client\Inventory\Data\PlayerCardEquip.cs" />

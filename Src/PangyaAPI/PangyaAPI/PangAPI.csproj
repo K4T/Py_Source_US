@@ -67,8 +67,8 @@
     <Compile Include="PangyaClient\Data\InventoryAbstract.cs" />
     <Compile Include="Properties\GlobalSuppressions.cs" />
     <Compile Include="PangyaPacket\ClientPacket.cs" />
-    <Compile Include="Tools\IniFiles.cs" />
     <Compile Include="Server\PangyaServer.cs" />
+    <Compile Include="Tools\IniFile.cs" />
     <Compile Include="Tools\Utils.cs" />
     <Compile Include="Tools\WriteConsole.cs" />
     <Compile Include="Tools\GenericDisposableCollection.cs" />

@@ -73,7 +73,7 @@ namespace Py_Game.Game.Modes
             var response = new PangyaBinaryWriter();
 
             response.WriteStr(fGameData.Name, 64); //ok
-            response.Write(fGameData.Password.Length > 0 ? false : true);
+            response.Write(fGameData.Password.Length == 0);
             response.Write(Started == true ? (byte)0 : (byte)1);
             response.Write(Await);//Orange
             response.Write(fGameData.MaxPlayer);
@@ -124,7 +124,7 @@ namespace Py_Game.Game.Modes
             response.Write(fGameData.VSTime);
             response.Write(fGameData.GameTime);
             response.Write(0); // trophy typeid
-            response.Write(fGameData.Password.Length > 0 ? false : true);
+            response.Write(fGameData.Password.Length == 0);
             if (fGameData.Password.Length > 0)
             {
                 response.WritePStr(fGameData.Password);
@@ -388,7 +388,7 @@ namespace Py_Game.Game.Modes
                 Send(ShowLeaveMatch(client.ConnectionID, 2));
 
             if (_allFinished())
-                _onAllPlayerFinished();
+                OnAllPlayerFinished();
         }
 
         public override void SendHoleData(GPlayer player)
@@ -424,7 +424,7 @@ namespace Py_Game.Game.Modes
 
             return true;
         }
-        private void _onAllPlayerFinished()
+        private void OnAllPlayerFinished()
         {
             // { copy score }
             CopyScore();

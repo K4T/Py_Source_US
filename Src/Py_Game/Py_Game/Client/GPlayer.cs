@@ -214,7 +214,8 @@ namespace Py_Game.Client
                             FileWrite.WriteLine($"--------------------------- PLAYER_EXCEPTION ------------------------------------------");
                             FileWrite.WriteLine($"Date: {DateTime.Now}");
                             FileWrite.WriteLine($"Player({GetLogin}), Index({GetUID})");
-                            FileWrite.WriteLine($"Message: {packet.Message.HexDump()}}");
+                            FileWrite.Write($"Message");
+                            FileWrite.WriteLine(" : " +packet.Message.HexDump());
                             FileWrite.WriteLine($"------------------------------- END ---------------------------------------------------");
                         }
                         this.Server.DisconnectPlayer(this);

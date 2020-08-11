@@ -15,7 +15,7 @@ using Py_Game.Game.Data;
 using System.Runtime.InteropServices;
 using Py_Game.Client.Data;
 using System.Collections.Generic;
-
+using System.Text;
 namespace Py_Game.MainServer
 {
     class Program
@@ -25,7 +25,7 @@ namespace Py_Game.MainServer
         #endregion
         static void Main()
         {
-            //Inicia servidor
+            ////Inicia servidor
             _server = new GameServer();           
             _server.ServerStart();
             _server.OnClientConnected += player =>
